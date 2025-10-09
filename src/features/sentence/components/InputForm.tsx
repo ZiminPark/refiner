@@ -22,6 +22,7 @@ export function InputForm() {
       setConverted({
         original: inputText,
         refined: result.converted,
+        explanation: result.explanation,
       });
     } catch (err) {
       console.error('Conversion error:', err);
@@ -129,8 +130,20 @@ export function InputForm() {
                 {converted.refined}
               </p>
               
+              {/* Explanation Section */}
+              {converted.explanation && (
+                <div className="mt-4 pt-4 border-t border-accent-success/20">
+                  <h4 className="text-sm font-semibold text-slate-700 mb-2">
+                    What Changed?
+                  </h4>
+                  <p className="text-sm leading-relaxed text-slate-600">
+                    {converted.explanation}
+                  </p>
+                </div>
+              )}
+              
               {/* Feedback Section */}
-              <div className="pt-4 border-t border-accent-success/20">
+              <div className="pt-4 border-t border-accent-success/20 mt-4">
                 <p className="text-sm leading-relaxed text-slate-600 mb-3">Was this helpful?</p>
                 <div className="flex gap-2">
                   <Button
