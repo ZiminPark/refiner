@@ -1,168 +1,159 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Github, Copy, Sparkles } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import axios from 'axios';
-
-const PACKAGE_NAME = '@easynext/cli';
-const CURRENT_VERSION = 'v0.1.38';
-
-function latestVersion(packageName: string) {
-  return axios
-    .get('https://registry.npmjs.org/' + packageName + '/latest')
-    .then((res) => res.data.version);
-}
+import { ArrowRight, CheckCircle, History, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
-  const { toast } = useToast();
-  const [latest, setLatest] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchLatestVersion = async () => {
-      try {
-        const version = await latestVersion(PACKAGE_NAME);
-        setLatest(`v${version}`);
-      } catch (error) {
-        console.error('Failed to fetch version info:', error);
-      }
-    };
-    fetchLatestVersion();
-  }, []);
-
-  const handleCopyCommand = () => {
-    navigator.clipboard.writeText(`npm install -g ${PACKAGE_NAME}@latest`);
-    toast({
-      description: 'Update command copied to clipboard',
-    });
-  };
-
-  const needsUpdate = latest && latest !== CURRENT_VERSION;
-
   return (
-    <div className="flex min-h-screen relative overflow-hidden">
-      {/* Main Content */}
-      <div className="min-h-screen flex bg-gray-100">
-        <div className="flex flex-col p-5 md:p-8 space-y-4">
-          <h1 className="text-3xl md:text-5xl font-semibold tracking-tighter !leading-tight text-left">
-            Easiest way to start
-            <br /> Next.js project
-            <br /> with Cursor
-          </h1>
-
-          <p className="text-lg text-muted-foreground">
-            Get Pro-created Next.js bootstrap just in seconds
-          </p>
-
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* Header */}
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="gap-2 w-fit rounded-full px-4 py-2 border border-black"
-            >
-              <a href="https://github.com/easynextjs/easynext" target="_blank">
-                <Github className="w-4 h-4" />
-                GitHub
-              </a>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="gap-2 w-fit rounded-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white"
-            >
-              <a href="https://easynext.org/premium" target="_blank">
-                <Sparkles className="w-4 h-4" />
-                Premium
-              </a>
-            </Button>
+            <Sparkles className="w-6 h-6 text-primary" />
+            <h1 className="text-xl font-bold text-gray-900">English Refiner</h1>
           </div>
-          <Section />
+          <Link href="/app">
+            <Button className="bg-primary hover:bg-primary-hover text-primary-foreground">
+              Try Now <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
         </div>
-      </div>
+      </header>
 
-      <div className="min-h-screen ml-16 flex-1 flex flex-col items-center justify-center space-y-4">
-        <div className="flex flex-col items-center space-y-2">
-          <p className="text-muted-foreground">
-            Current Version: {CURRENT_VERSION}
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20 md:py-32">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
+            <span className="text-sm font-semibold text-primary">AI-Powered English Refinement</span>
+          </div>
+          <h1 className="text-5xl font-bold leading-tight text-gray-900 sm:text-6xl">
+            Refine Your English
+            <br />
+            <span className="text-primary">Instantly & Naturally</span>
+          </h1>
+          <p className="text-lg leading-relaxed text-gray-600 max-w-2xl mx-auto">
+            Transform your sentences into natural, grammatically correct American English. 
+            Perfect for students learning English and professionals crafting important communications.
           </p>
-          <p className="text-muted-foreground">
-            Latest Version:{' '}
-            <span className="font-bold">{latest || 'Loading...'}</span>
-          </p>
+          <div className="flex gap-4 justify-center pt-4">
+            <Link href="/app">
+              <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground text-base font-semibold">
+                Get Started Free
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {needsUpdate && (
-          <div className="flex flex-col items-center space-y-2">
-            <p className="text-yellow-600">New version available!</p>
-            <p className="text-sm text-muted-foreground">
-              Copy and run the command below to update:
-            </p>
-            <div className="relative group">
-              <pre className="bg-gray-100 p-4 rounded-lg">
-                npm install -g {PACKAGE_NAME}@latest
-              </pre>
-              <button
-                onClick={handleCopyCommand}
-                className="absolute top-2 right-2 p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Copy className="w-4 h-4" />
-              </button>
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-semibold leading-snug text-gray-800 text-center mb-12">
+            Why Choose English Refiner?
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <FeatureCard
+              icon={<CheckCircle className="w-8 h-8 text-accent-success" />}
+              title="Grammar Correction"
+              description="Automatically detect and fix grammatical errors in your sentences."
+            />
+            <FeatureCard
+              icon={<Sparkles className="w-8 h-8 text-primary" />}
+              title="Natural Phrasing"
+              description="Convert your sentences to sound natural and fluent in American English."
+            />
+            <FeatureCard
+              icon={<History className="w-8 h-8 text-accent-info" />}
+              title="Conversion History"
+              description="Keep track of all your past conversions for easy reference and learning."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-semibold leading-snug text-gray-800 text-center mb-12">
+            How It Works
+          </h2>
+          <div className="space-y-6">
+            <StepCard number={1} title="Enter Your Sentence" description="Type or paste the sentence you want to refine" />
+            <StepCard number={2} title="Click Convert" description="Our AI analyzes and refines your sentence instantly" />
+            <StepCard number={3} title="Review & Learn" description="Compare the original and refined versions to improve your English" />
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container mx-auto px-4 py-20 bg-primary/5">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
+          <h2 className="text-4xl font-semibold leading-snug text-gray-800">
+            Ready to Improve Your English?
+          </h2>
+          <p className="text-lg leading-relaxed text-gray-600">
+            Start refining your sentences now and communicate with confidence.
+          </p>
+          <Link href="/app">
+            <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground text-base font-semibold">
+              Start Refining
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t bg-gray-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <span className="text-sm leading-relaxed text-gray-500">
+                © 2025 English Refiner. All rights reserved.
+              </span>
+            </div>
+            <div className="flex gap-6">
+              <Link href="/app" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
+                App
+              </Link>
+              <Link href="/app/history" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
+                History
+              </Link>
+              <Link href="/app/settings" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
+                Settings
+              </Link>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }
 
-function Section() {
-  const items = [
-    { href: 'https://nextjs.org/', label: 'Next.js' },
-    { href: 'https://ui.shadcn.com/', label: 'shadcn/ui' },
-    { href: 'https://tailwindcss.com/', label: 'Tailwind CSS' },
-    { href: 'https://www.framer.com/motion/', label: 'framer-motion' },
-    { href: 'https://zod.dev/', label: 'zod' },
-    { href: 'https://date-fns.org/', label: 'date-fns' },
-    { href: 'https://ts-pattern.dev/', label: 'ts-pattern' },
-    { href: 'https://es-toolkit.dev/', label: 'es-toolkit' },
-    { href: 'https://zustand.docs.pmnd.rs/', label: 'zustand' },
-    { href: 'https://supabase.com/', label: 'supabase' },
-    { href: 'https://react-hook-form.com/', label: 'react-hook-form' },
-  ];
-
+function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="flex flex-col py-5 md:py-8 space-y-2 opacity-75">
-      <p className="font-semibold">What&apos;s Included</p>
-
-      <div className="flex flex-col space-y-1 text-muted-foreground">
-        {items.map((item) => (
-          <SectionItem key={item.href} href={item.href}>
-            {item.label}
-          </SectionItem>
-        ))}
-      </div>
+    <div className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary/50 transition-colors">
+      <div className="mb-4">{icon}</div>
+      <h3 className="text-2xl font-semibold leading-relaxed mb-2 text-gray-900">{title}</h3>
+      <p className="text-base leading-relaxed text-gray-600">{description}</p>
     </div>
   );
 }
 
-function SectionItem({
-  children,
-  href,
-}: {
-  children: React.ReactNode;
-  href: string;
-}) {
+function StepCard({ number, title, description }: { number: number; title: string; description: string }) {
   return (
-    <a
-      href={href}
-      className="flex items-center gap-2 underline"
-      target="_blank"
-    >
-      <CheckCircle className="w-4 h-4" />
-      <p>{children}</p>
-    </a>
+    <div className="flex items-start gap-4">
+      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+        {number}
+      </div>
+      <div>
+        <h3 className="text-xl font-semibold text-gray-900 mb-1">{title}</h3>
+        <p className="text-base leading-relaxed text-gray-600">{description}</p>
+      </div>
+    </div>
   );
 }
