@@ -59,14 +59,14 @@ export function AppSidebar() {
               'w-full transition-all text-gray-700 hover:bg-gray-100 hover:text-gray-900',
               isCollapsed ? 'justify-center px-0' : 'justify-start gap-3'
             )}
-            title={isCollapsed ? (isCollapsed ? '사이드바 펼치기' : '사이드바 접기') : undefined}
+            title={isCollapsed ? 'Expand sidebar' : undefined}
           >
             {isCollapsed ? (
               <ChevronRight className="w-5 h-5" />
             ) : (
               <>
                 <ChevronLeft className="w-5 h-5" />
-                <span>사이드바 접기</span>
+                <span>Collapse sidebar</span>
               </>
             )}
           </Button>
