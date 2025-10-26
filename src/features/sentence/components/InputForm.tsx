@@ -22,30 +22,51 @@ export function InputForm() {
 
     let isCancelled = false;
 
-    const pasteClipboard = async () => {
+    const isPermissionError = (error: unknown) => {
+      if (!error || typeof error !== 'object') return false;
+      const name = (error as { name?: string }).name;
+      return name === 'NotAllowedError' || name === 'SecurityError' || name === 'PermissionDeniedError';
+    };
+
+    const pasteClipboard = async (userInitiated = false) => {
       if (!navigator?.clipboard?.readText) {
-        setClipboardPrefilled(true);
+        if (!isCancelled) {
+          setClipboardPrefilled(true);
+        }
         return;
       }
 
       try {
         const text = await navigator.clipboard.readText();
-        if (!isCancelled && text) {
-          setInputText(text);
+        if (!isCancelled) {
+          if (text) {
+            setInputText(text);
+          }
+          setClipboardPrefilled(true);
         }
       } catch (clipError) {
+        if (!userInitiated && isPermissionError(clipError)) {
+          return;
+        }
+
         console.warn('Auto-paste failed:', clipError);
-      } finally {
         if (!isCancelled) {
           setClipboardPrefilled(true);
         }
       }
     };
 
+    const handleUserActivation = () => pasteClipboard(true);
+
     pasteClipboard();
+
+    document.addEventListener('pointerdown', handleUserActivation, { once: true });
+    document.addEventListener('keydown', handleUserActivation, { once: true });
 
     return () => {
       isCancelled = true;
+      document.removeEventListener('pointerdown', handleUserActivation);
+      document.removeEventListener('keydown', handleUserActivation);
     };
   }, [clipboardPrefilled, inputText]);
 
