@@ -13,6 +13,7 @@ export function InputForm() {
   const [converted, setConverted] = useState<ConversionResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
+  const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
 
   // Prefill the textarea with clipboard contents so users can convert immediately after landing.
@@ -48,6 +49,23 @@ export function InputForm() {
     };
   }, [clipboardPrefilled, inputText]);
 
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+
+    const platform =
+      (navigator as Navigator & { userAgentData?: { platform?: string } }).userAgentData?.platform ?? 
+      navigator.platform ?? 
+      navigator.userAgent ?? 
+      '';
+
+    if (!platform) {
+      setIsMacUser(null);
+      return;
+    }
+
+    setIsMacUser(/mac|darwin|iphone|ipad/i.test(platform));
+  }, []);
+
   const handleConvert = useCallback(async () => {
     if (!inputText.trim() || isLoading) return;
 
@@ -64,6 +82,10 @@ export function InputForm() {
   }, [convertSentence, inputText, isLoading]);
 
   const canConvert = Boolean(inputText.trim()) && !isLoading;
+  const shortcutLabel =
+    isMacUser === null ? 'Cmd or Ctrl + Enter' : isMacUser ? 'Cmd + Enter' : 'Ctrl + Enter';
+  const ariaShortcut =
+    isMacUser === null ? 'Meta+Enter Control+Enter' : isMacUser ? 'Meta+Enter' : 'Control+Enter';
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -125,7 +147,7 @@ export function InputForm() {
             disabled={!canConvert}
             size="lg"
             className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-primary-foreground"
-            aria-keyshortcuts="Meta+Enter Control+Enter"
+            aria-keyshortcuts={ariaShortcut}
           >
             {isLoading ? (
               <>
@@ -141,7 +163,7 @@ export function InputForm() {
             )}
           </Button>
           <p className="text-sm text-slate-500">
-            Press <span className="font-semibold">Cmd + Enter</span> (or <span className="font-semibold">Ctrl + Enter</span> on Windows) to refine instantly.
+            Press <span className="font-semibold">{shortcutLabel}</span> to refine instantly.
           </p>
         </CardContent>
       </Card>
