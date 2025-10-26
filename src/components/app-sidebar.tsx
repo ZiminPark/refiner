@@ -22,10 +22,28 @@ export function AppSidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden md:flex border-r bg-gray-50 flex-col transition-all duration-300 relative",
+        "hidden md:flex border-r bg-gray-50 flex-col transition-all duration-300 relative h-screen",
         isCollapsed ? "w-20" : "w-64"
       )}>
-        <nav className="flex-1 p-4 space-y-2">
+        {/* Toggle Icon */}
+        <div className="p-4 border-b">
+          <button
+            onClick={toggle}
+            className={cn(
+              'p-2 rounded-md transition-all text-gray-700 hover:bg-gray-100 hover:text-gray-900',
+              'flex items-center justify-center'
+            )}
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-5 h-5" />
+            ) : (
+              <ChevronLeft className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -49,28 +67,6 @@ export function AppSidebar() {
             );
           })}
         </nav>
-        
-        {/* Toggle Button */}
-        <div className="p-4 border-t">
-          <Button
-            variant="ghost"
-            onClick={toggle}
-            className={cn(
-              'w-full transition-all text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-              isCollapsed ? 'justify-center px-0' : 'justify-start gap-3'
-            )}
-            title={isCollapsed ? 'Expand sidebar' : undefined}
-          >
-            {isCollapsed ? (
-              <ChevronRight className="w-5 h-5" />
-            ) : (
-              <>
-                <ChevronLeft className="w-5 h-5" />
-                <span>Collapse sidebar</span>
-              </>
-            )}
-          </Button>
-        </div>
       </aside>
 
       {/* Mobile Sidebar */}
