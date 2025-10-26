@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowRight, Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
 
@@ -12,10 +12,44 @@ export function InputForm() {
   const [inputText, setInputText] = useState('');
   const [converted, setConverted] = useState<ConversionResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const { convertSentence, isLoading, error } = useConvertSentence();
 
-  const handleConvert = async () => {
-    if (!inputText.trim()) return;
+  // Prefill the textarea with clipboard contents so users can convert immediately after landing.
+  useEffect(() => {
+    if (clipboardPrefilled || inputText) return;
+
+    let isCancelled = false;
+
+    const pasteClipboard = async () => {
+      if (!navigator?.clipboard?.readText) {
+        setClipboardPrefilled(true);
+        return;
+      }
+
+      try {
+        const text = await navigator.clipboard.readText();
+        if (!isCancelled && text) {
+          setInputText(text);
+        }
+      } catch (clipError) {
+        console.warn('Auto-paste failed:', clipError);
+      } finally {
+        if (!isCancelled) {
+          setClipboardPrefilled(true);
+        }
+      }
+    };
+
+    pasteClipboard();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [clipboardPrefilled, inputText]);
+
+  const handleConvert = useCallback(async () => {
+    if (!inputText.trim() || isLoading) return;
 
     try {
       const result = await convertSentence({ text: inputText });
@@ -27,7 +61,28 @@ export function InputForm() {
     } catch (err) {
       console.error('Conversion error:', err);
     }
-  };
+  }, [convertSentence, inputText, isLoading]);
+
+  const canConvert = Boolean(inputText.trim()) && !isLoading;
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.key !== 'Enter' ||
+        (!event.metaKey && !event.ctrlKey) ||
+        !canConvert
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      handleConvert();
+    };
+
+    window.addEventListener('keydown', handleShortcut);
+    return () => window.removeEventListener('keydown', handleShortcut);
+  }, [handleConvert, canConvert]);
 
   const handleCopy = () => {
     if (converted) {
@@ -67,9 +122,10 @@ export function InputForm() {
 
           <Button
             onClick={handleConvert}
-            disabled={!inputText.trim() || isLoading}
+            disabled={!canConvert}
             size="lg"
             className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-primary-foreground"
+            aria-keyshortcuts="Meta+Enter Control+Enter"
           >
             {isLoading ? (
               <>
@@ -84,6 +140,9 @@ export function InputForm() {
               </>
             )}
           </Button>
+          <p className="text-sm text-slate-500">
+            Press <span className="font-semibold">Cmd + Enter</span> (or <span className="font-semibold">Ctrl + Enter</span> on Windows) to refine instantly.
+          </p>
         </CardContent>
       </Card>
 
