@@ -38,15 +38,3 @@ npm run dev
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인할 수 있습니다.
 
 `app/page.tsx` 파일을 수정하여 페이지를 편집할 수 있습니다. 파일을 수정하면 자동으로 페이지가 업데이트됩니다.
-
-## 배포하기
-
-앱을 프로덕션 환경에 배포하는 방법은 [배포 가이드](./DEPLOYMENT.md)를 참고하세요.
-
-**빠른 배포 (Vercel):**
-1. [Vercel](https://vercel.com)에 로그인
-2. 프로젝트 Import
-3. 환경 변수 설정
-4. Deploy 버튼 클릭
-
-자세한 내용은 [DEPLOYMENT.md](./DEPLOYMENT.md) 참고
