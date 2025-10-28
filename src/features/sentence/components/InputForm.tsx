@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowRight, Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
 
@@ -14,6 +14,7 @@ export function InputForm() {
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
 
   // Prefill the textarea with clipboard contents so users can convert immediately after landing.
@@ -106,6 +107,44 @@ export function InputForm() {
     return () => window.removeEventListener('keydown', handleShortcut);
   }, [handleConvert, canConvert]);
 
+  useEffect(() => {
+    const handleFocusShortcut = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.key !== '/' ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target &&
+        target instanceof HTMLElement &&
+        (target instanceof HTMLInputElement ||
+          target instanceof HTMLTextAreaElement ||
+          target.isContentEditable ||
+          target.getAttribute('role') === 'textbox')
+      ) {
+        return;
+      }
+
+      const textarea = textareaRef.current;
+      if (!textarea) {
+        return;
+      }
+
+      event.preventDefault();
+      textarea.focus();
+    };
+
+    window.addEventListener('keydown', handleFocusShortcut);
+    return () => window.removeEventListener('keydown', handleFocusShortcut);
+  }, []);
+
   const handleCopy = () => {
     if (converted) {
       navigator.clipboard.writeText(converted.refined);
@@ -134,6 +173,7 @@ export function InputForm() {
             onChange={(e) => setInputText(e.target.value)}
             className="min-h-[120px] text-base leading-relaxed bg-white border-slate-200 text-slate-900 placeholder:text-gray-400"
             disabled={isLoading}
+            ref={textareaRef}
           />
           
           {error && (
@@ -162,9 +202,14 @@ export function InputForm() {
               </>
             )}
           </Button>
-          <p className="text-sm text-slate-500">
-            Press <span className="font-semibold">{shortcutLabel}</span> to refine instantly.
-          </p>
+          <div className="space-y-1 text-sm text-slate-500">
+            <p>
+              Press <span className="font-semibold">{shortcutLabel}</span> to refine instantly.
+            </p>
+            <p>
+              Press <span className="font-semibold">/</span> to jump to the input box.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
