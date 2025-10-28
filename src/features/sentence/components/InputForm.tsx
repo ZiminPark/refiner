@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowRight, Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
 
@@ -14,6 +14,7 @@ export function InputForm() {
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
 
   // Prefill the textarea with clipboard contents so users can convert immediately after landing.
@@ -106,6 +107,40 @@ export function InputForm() {
     return () => window.removeEventListener('keydown', handleShortcut);
   }, [handleConvert, canConvert]);
 
+  useEffect(() => {
+    const handleFocusShortcut = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        (event.key !== '/' && event.key !== '?') ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      if (target) {
+        const tagName = target.tagName?.toLowerCase();
+        if (tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable) {
+          return;
+        }
+      }
+
+      if (!textareaRef.current) {
+        return;
+      }
+
+      event.preventDefault();
+      textareaRef.current.focus({ preventScroll: true });
+      const valueLength = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(valueLength, valueLength);
+    };
+
+    window.addEventListener('keydown', handleFocusShortcut);
+    return () => window.removeEventListener('keydown', handleFocusShortcut);
+  }, []);
+
   const handleCopy = () => {
     if (converted) {
       navigator.clipboard.writeText(converted.refined);
@@ -134,6 +169,7 @@ export function InputForm() {
             onChange={(e) => setInputText(e.target.value)}
             className="min-h-[120px] text-base leading-relaxed bg-white border-slate-200 text-slate-900 placeholder:text-gray-400"
             disabled={isLoading}
+            ref={textareaRef}
           />
           
           {error && (
