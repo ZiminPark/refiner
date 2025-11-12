@@ -8,8 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Bell, Palette, Save, User } from 'lucide-react';
-import { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { usePromptSetting } from '@/hooks/usePromptSetting';
+import { Bell, Palette, Save, Sparkles, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
@@ -22,8 +24,16 @@ export default function SettingsPage() {
     emailNotifications: false,
     saveHistory: true,
   });
+  // TODO: Replace localStorage-backed prompt persistence with database storage.
+  const { prompt, setPrompt, defaultPrompt } = usePromptSetting();
+  const [promptDraft, setPromptDraft] = useState(prompt);
+
+  useEffect(() => {
+    setPromptDraft(prompt);
+  }, [prompt]);
 
   const handleSave = () => {
+    setPrompt(promptDraft.trim().length > 0 ? promptDraft : defaultPrompt);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -38,6 +48,49 @@ export default function SettingsPage() {
       </div>
 
       <div className="space-y-6">
+        {/* Prompt Configuration */}
+        <Card className="bg-slate-50 border-slate-200">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <div>
+                <CardTitle className="text-2xl font-semibold leading-relaxed">AI Prompt</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  Customize how the AI refines your sentences.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="prompt" className="text-sm font-semibold">
+                Refinement Prompt
+              </Label>
+              <Textarea
+                id="prompt"
+                value={promptDraft}
+                onChange={(event) => setPromptDraft(event.target.value)}
+                rows={8}
+                className="text-base leading-relaxed bg-white border-slate-200 text-slate-900"
+              />
+            </div>
+            <p className="text-sm leading-relaxed text-gray-500">
+              This prompt guides the AI&apos;s behavior when refining your sentences.
+            </p>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setPromptDraft(defaultPrompt)}
+                className="w-full sm:w-auto"
+              >
+                Reset to Default
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Profile Section */}
         <Card className="bg-slate-50 border-slate-200">
           <CardHeader>

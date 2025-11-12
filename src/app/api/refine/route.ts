@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import { DEFAULT_REFINER_PROMPT } from '@/lib/prompt';
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -15,7 +16,7 @@ const RefinementResponse = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const { text } = await request.json();
+    const { text, prompt } = await request.json();
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
@@ -31,22 +32,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const systemPrompt = typeof prompt === 'string' && prompt.trim().length > 0 ? prompt : DEFAULT_REFINER_PROMPT;
+
     const completion = await client.chat.completions.parse({
       model: 'gpt-5',
       messages: [
         {
           role: 'system',
-          content: `You are an expert English writing assistant specializing in converting non-native English into natural, fluent American English. 
-
-Your task:
-- Refine the input sentence into natural American English
-- Maintain the original meaning and intent
-- Improve grammar, vocabulary, and sentence structure
-- Make it sound like a native American English speaker wrote it
-- Keep the tone appropriate for the context (professional, casual, etc.)
-- Provide a brief explanation of the key changes you made
-
-Respond with both the refined sentence and a clear explanation of improvements.`,
+          content: systemPrompt,
         },
         {
           role: 'user',
