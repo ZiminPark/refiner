@@ -73,8 +73,14 @@ export function AppSidebar() {
       <div className="md:hidden fixed bottom-4 right-4 z-50">
         <Sheet>
           <SheetTrigger asChild>
-            <Button size="lg" className="rounded-full w-14 h-14 shadow-lg">
-              <Menu className="w-6 h-6" />
+            <Button
+              size="lg"
+              className="rounded-full p-2 shadow-lg bg-white/90 text-gray-900 border border-gray-200 backdrop-blur-sm flex items-center justify-center hover:bg-white"
+              aria-label="Open menu"
+            >
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
+                <Menu className="w-5 h-5" aria-hidden="true" />
+              </div>
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0">
