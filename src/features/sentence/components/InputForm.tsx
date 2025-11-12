@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowRight, Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePromptSetting } from '@/hooks/usePromptSetting';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
 
@@ -16,6 +17,7 @@ export function InputForm() {
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
+  const { prompt } = usePromptSetting();
 
   // Prefill the textarea with clipboard contents so users can convert immediately after landing.
   useEffect(() => {
@@ -71,7 +73,10 @@ export function InputForm() {
     if (!inputText.trim() || isLoading) return;
 
     try {
-      const result = await convertSentence({ text: inputText });
+      const result = await convertSentence({
+        text: inputText,
+        prompt,
+      });
       setConverted({
         original: inputText,
         refined: result.converted,
@@ -80,7 +85,7 @@ export function InputForm() {
     } catch (err) {
       console.error('Conversion error:', err);
     }
-  }, [convertSentence, inputText, isLoading]);
+  }, [convertSentence, inputText, isLoading, prompt]);
 
   const canConvert = Boolean(inputText.trim()) && !isLoading;
   const shortcutLabel =
