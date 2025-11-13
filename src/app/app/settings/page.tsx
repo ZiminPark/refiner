@@ -11,10 +11,13 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
 import { Bell, Palette, Save, Sparkles, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SettingsPage() {
-  const [saved, setSaved] = useState(false);
+  const [promptSaved, setPromptSaved] = useState(false);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+  const promptSaveTimeoutRef = useRef<number | null>(null);
+  const settingsSaveTimeoutRef = useRef<number | null>(null);
   const [settings, setSettings] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -27,15 +30,54 @@ export default function SettingsPage() {
   // TODO: Replace localStorage-backed prompt persistence with database storage.
   const { prompt, setPrompt, defaultPrompt } = usePromptSetting();
   const [promptDraft, setPromptDraft] = useState(prompt);
+  const isPromptDirty = promptDraft !== prompt;
 
   useEffect(() => {
     setPromptDraft(prompt);
   }, [prompt]);
 
-  const handleSave = () => {
-    setPrompt(promptDraft.trim().length > 0 ? promptDraft : defaultPrompt);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  useEffect(() => {
+    return () => {
+      if (promptSaveTimeoutRef.current) {
+        window.clearTimeout(promptSaveTimeoutRef.current);
+      }
+      if (settingsSaveTimeoutRef.current) {
+        window.clearTimeout(settingsSaveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handlePromptSave = () => {
+    const nextPrompt = promptDraft.trim().length > 0 ? promptDraft : defaultPrompt;
+    const shouldShowSaved = isPromptDirty || nextPrompt !== prompt;
+
+    setPrompt(nextPrompt);
+    setPromptDraft(nextPrompt);
+
+    if (shouldShowSaved) {
+      setPromptSaved(true);
+      if (promptSaveTimeoutRef.current) {
+        window.clearTimeout(promptSaveTimeoutRef.current);
+      }
+      promptSaveTimeoutRef.current = window.setTimeout(() => {
+        setPromptSaved(false);
+        promptSaveTimeoutRef.current = null;
+      }, 3000);
+    }
+
+    return shouldShowSaved;
+  };
+
+  const handleSettingsSave = () => {
+    handlePromptSave();
+    setSettingsSaved(true);
+    if (settingsSaveTimeoutRef.current) {
+      window.clearTimeout(settingsSaveTimeoutRef.current);
+    }
+    settingsSaveTimeoutRef.current = window.setTimeout(() => {
+      setSettingsSaved(false);
+      settingsSaveTimeoutRef.current = null;
+    }, 3000);
   };
 
   return (
@@ -77,16 +119,31 @@ export default function SettingsPage() {
             <p className="text-sm leading-relaxed text-gray-500">
               This prompt guides the AI&apos;s behavior when refining your sentences.
             </p>
-            <div className="flex justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setPromptDraft(defaultPrompt)}
-                className="w-full sm:w-auto"
-              >
-                Reset to Default
-              </Button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              {promptSaved && (
+                <span className="text-sm font-medium text-primary">Prompt saved!</span>
+              )}
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPromptDraft(defaultPrompt)}
+                  className="w-full sm:w-auto"
+                >
+                  Reset to Default
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handlePromptSave}
+                  disabled={!isPromptDirty}
+                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary-hover"
+                >
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Prompt
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -304,11 +361,11 @@ export default function SettingsPage() {
         <div className="flex justify-end gap-3">
           <Button variant="outline">Cancel</Button>
           <Button
-            onClick={handleSave}
+            onClick={handleSettingsSave}
             className="bg-primary hover:bg-primary-hover text-primary-foreground gap-2"
           >
             <Save className="w-4 h-4" />
-            {saved ? 'Settings Saved!' : 'Save Changes'}
+            {settingsSaved ? 'Settings Saved!' : 'Save Changes'}
           </Button>
         </div>
       </div>
