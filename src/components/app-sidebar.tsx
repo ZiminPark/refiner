@@ -9,9 +9,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const navItems = [
-  { href: '/app', label: 'Refine', icon: Home },
-  { href: '/app/history', label: 'History', icon: History },
-  { href: '/app/settings', label: 'Settings', icon: Settings },
+  { href: '/home', label: 'Refine', icon: Home },
+  { href: '/home/history', label: 'History', icon: History },
+  { href: '/home/settings', label: 'Settings', icon: Settings },
 ];
 
 export function AppSidebar() {

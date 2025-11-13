@@ -14,7 +14,7 @@ export default function Home() {
             <Sparkles className="w-6 h-6 text-primary" />
             <h1 className="text-xl font-bold text-gray-900">English Refiner</h1>
           </div>
-          <Link href="/app">
+          <Link href="/home">
             <Button className="bg-primary hover:bg-primary-hover text-primary-foreground">
               Try Now <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -38,7 +38,7 @@ export default function Home() {
             Perfect for students learning English and professionals crafting important communications.
           </p>
           <div className="flex gap-4 justify-center pt-4">
-            <Link href="/app">
+            <Link href="/home">
               <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground text-base font-semibold">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -97,7 +97,7 @@ export default function Home() {
           <p className="text-lg leading-relaxed text-gray-600">
             Start refining your sentences now and communicate with confidence.
           </p>
-          <Link href="/app">
+          <Link href="/home">
             <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground text-base font-semibold">
               Start Refining
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -117,13 +117,13 @@ export default function Home() {
               </span>
             </div>
             <div className="flex gap-6">
-              <Link href="/app" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
+              <Link href="/home" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
                 App
               </Link>
-              <Link href="/app/history" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
+              <Link href="/home/history" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
                 History
               </Link>
-              <Link href="/app/settings" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
+              <Link href="/home/settings" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
                 Settings
               </Link>
             </div>

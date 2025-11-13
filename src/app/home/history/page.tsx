@@ -105,7 +105,7 @@ export default function HistoryPage() {
               Start refining your sentences to build your history
             </p>
             <Button asChild className="bg-primary hover:bg-primary-hover">
-              <a href="/app">
+              <a href="/home">
                 Start Refining
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
