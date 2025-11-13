@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
-import { Bell, Palette, Save, Sparkles, User } from 'lucide-react';
+import { AlertCircle, Bell, CheckCircle2, Palette, Save, Sparkles, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function SettingsPage() {
@@ -119,31 +119,35 @@ export default function SettingsPage() {
             <p className="text-sm leading-relaxed text-gray-500">
               This prompt guides the AI&apos;s behavior when refining your sentences.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              {promptSaved && (
-                <span className="text-sm font-medium text-primary">Prompt saved!</span>
-              )}
-              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPromptDraft(defaultPrompt)}
-                  className="w-full sm:w-auto"
-                >
-                  Reset to Default
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={handlePromptSave}
-                  disabled={!isPromptDirty}
-                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary-hover"
-                >
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Prompt
-                </Button>
-              </div>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="default"
+                onClick={() => setPromptDraft(defaultPrompt)}
+                className="w-full sm:w-auto border-slate-300 text-slate-700 hover:bg-slate-50"
+              >
+                Reset to Default
+              </Button>
+              <Button
+                type="button"
+                size="default"
+                onClick={handlePromptSave}
+                disabled={!isPromptDirty}
+                className="w-full sm:w-auto bg-primary text-primary-foreground shadow-md hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[140px]"
+              >
+                {promptSaved && !isPromptDirty ? (
+                  <>
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save Prompt
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
