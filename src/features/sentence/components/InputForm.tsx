@@ -162,9 +162,9 @@ export function InputForm() {
       setCopied(true);
       toast({
         description: '복사되었습니다.',
-        duration: 5000,
+        duration: 10000,
         className:
-          'bg-white/70 backdrop-blur-sm text-slate-800 border border-slate-200 shadow-md sm:max-w-[320px]',
+          'bg-emerald-600 text-white border-emerald-500 shadow-[0_15px_40px_-10px_rgba(16,185,129,0.75)] font-semibold tracking-tight sm:max-w-[360px]',
       });
       return true;
     } catch (clipError) {
