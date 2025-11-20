@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowRight, Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
+import { useToast } from '@/hooks/use-toast';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
 
@@ -18,6 +19,7 @@ export function InputForm() {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
   const { prompt } = usePromptSetting();
+  const { toast } = useToast();
 
   // Prefill the textarea with clipboard contents so users can convert immediately after landing.
   useEffect(() => {
@@ -150,13 +152,40 @@ export function InputForm() {
     return () => window.removeEventListener('keydown', handleFocusShortcut);
   }, []);
 
-  const handleCopy = () => {
-    if (converted) {
-      navigator.clipboard.writeText(converted.refined);
+  const copyRefinedToClipboard = useCallback(async () => {
+    if (!converted?.refined || typeof navigator === 'undefined') {
+      return false;
+    }
+
+    try {
+      await navigator.clipboard.writeText(converted.refined);
       setCopied(true);
+      toast({
+        description: '복사되었습니다.',
+        duration: 5000,
+        className:
+          'bg-white/70 backdrop-blur-sm text-slate-800 border border-slate-200 shadow-md sm:max-w-[320px]',
+      });
+      return true;
+    } catch (clipError) {
+      console.error('Clipboard copy failed:', clipError);
+      return false;
+    } finally {
       setTimeout(() => setCopied(false), 2000);
     }
+  }, [converted?.refined, toast]);
+
+  const handleCopy = () => {
+    copyRefinedToClipboard();
   };
+
+  useEffect(() => {
+    if (!converted) {
+      return;
+    }
+
+    copyRefinedToClipboard();
+  }, [converted, copyRefinedToClipboard]);
 
   const handleFeedback = (isPositive: boolean) => {
     alert(`Feedback ${isPositive ? 'positive' : 'negative'} recorded (UI only)`);
