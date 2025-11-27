@@ -242,17 +242,6 @@ export function InputForm() {
       {/* Conversion Result */}
       {converted && (
         <div className="space-y-4">
-          <Card className="border border-border bg-white/80">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-secondary">
-                Original
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-base leading-relaxed text-[#444444]">{converted.original}</p>
-            </CardContent>
-          </Card>
-
           <Card className="border border-primary/30 bg-white">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
