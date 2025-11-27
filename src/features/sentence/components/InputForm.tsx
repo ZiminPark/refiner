@@ -161,10 +161,10 @@ export function InputForm() {
       await navigator.clipboard.writeText(converted.refined);
       setCopied(true);
       toast({
-        description: '복사되었습니다.',
+        description: 'Copied. Paste to use it.',
         duration: 10000,
         className:
-          'bg-emerald-600 text-white border-emerald-500 shadow-[0_15px_40px_-10px_rgba(16,185,129,0.75)] font-semibold tracking-tight sm:max-w-[360px]',
+          'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-none font-semibold tracking-tight sm:max-w-[360px]',
       });
       return true;
     } catch (clipError) {
