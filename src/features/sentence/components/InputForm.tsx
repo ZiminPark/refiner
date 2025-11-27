@@ -269,7 +269,7 @@ export function InputForm() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="mb-4 text-base font-medium leading-relaxed text-foreground">
+              <p className="mb-4 text-base font-medium leading-relaxed text-foreground whitespace-pre-wrap">
                 {converted.refined}
               </p>
               
@@ -279,7 +279,7 @@ export function InputForm() {
                   <h4 className="mb-2 text-sm font-semibold text-secondary">
                     What Changed?
                   </h4>
-                  <p className="text-sm leading-relaxed text-secondary">
+                  <p className="text-sm leading-relaxed text-secondary whitespace-pre-wrap">
                     {converted.explanation}
                   </p>
                 </div>

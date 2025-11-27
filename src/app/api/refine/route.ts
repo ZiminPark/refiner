@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
     const message = completion.choices[0]?.message;
     
     if (message?.parsed) {
+      console.log('[refine] input raw:', JSON.stringify(text));
+      console.log('[refine] parsed response:', {
+        refined_sentence: message.parsed.refined_sentence,
+        explanation: message.parsed.explanation,
+        usage: completion.usage,
+      });
       return NextResponse.json({
         converted: message.parsed.refined_sentence,
         explanation: message.parsed.explanation,
@@ -63,6 +69,10 @@ export async function POST(request: NextRequest) {
         },
       });
     } else if (message?.refusal) {
+      console.warn('[refine] model refusal:', {
+        input: text,
+        refusal: message.refusal,
+      });
       return NextResponse.json(
         { error: 'Model refused to process the request', details: message.refusal },
         { status: 400 }
@@ -70,6 +80,11 @@ export async function POST(request: NextRequest) {
     } else {
       // Fallback in case parsing fails
       const converted = message?.content || text;
+      console.warn('[refine] fallback response path used:', {
+        input: text,
+        rawMessage: message,
+        usage: completion.usage,
+      });
       return NextResponse.json({
         converted: converted.trim(),
         usage: {
