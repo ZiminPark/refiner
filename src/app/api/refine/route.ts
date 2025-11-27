@@ -1,8 +1,8 @@
+import { DEFAULT_REFINER_PROMPT } from '@/lib/prompt';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
-import { DEFAULT_REFINER_PROMPT } from '@/lib/prompt';
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -51,14 +51,8 @@ export async function POST(request: NextRequest) {
     });
 
     const message = completion.choices[0]?.message;
-    
+
     if (message?.parsed) {
-      console.log('[refine] input raw:', JSON.stringify(text));
-      console.log('[refine] parsed response:', {
-        refined_sentence: message.parsed.refined_sentence,
-        explanation: message.parsed.explanation,
-        usage: completion.usage,
-      });
       return NextResponse.json({
         converted: message.parsed.refined_sentence,
         explanation: message.parsed.explanation,
