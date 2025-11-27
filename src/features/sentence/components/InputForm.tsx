@@ -214,32 +214,28 @@ export function InputForm() {
             </div>
           )}
 
-          <Button
-            onClick={handleConvert}
-            disabled={!canConvert}
-            className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
-            aria-keyshortcuts={ariaShortcut}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Converting...
-              </>
-            ) : (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button
+              onClick={handleConvert}
+              disabled={!canConvert}
+              className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
+              aria-keyshortcuts={ariaShortcut}
+            >
+              {isLoading ? (
                 <>
-                  <span>Refine</span>
-                  <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
-                    <span className={shortcutKeyClassName}>{shortcutLabel}</span>
-                  </span>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Converting...
                 </>
-            )}
-          </Button>
-
-          <div className="space-y-2 text-xs text-muted-foreground">
-            <div className="flex flex-wrap gap-3">
-              
-              <ShortcutHint label="/" description="Jump to input" />
-            </div>
+              ) : (
+                  <>
+                    <span>Refine</span>
+                    <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
+                      <span className={shortcutKeyClassName}>{shortcutLabel}</span>
+                    </span>
+                  </>
+              )}
+            </Button>
+            <ShortcutHint label="/" description="Jump to input" />
           </div>
         </CardContent>
       </Card>
