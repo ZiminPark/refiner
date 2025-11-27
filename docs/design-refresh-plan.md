@@ -30,6 +30,11 @@
 - Add a `--texture-opacity` custom property to control the paper grain strength; expose a `.texture-none` utility for internal QA even though there is no user-facing toggle.
 - Adjust shadcn component tokens (buttons, cards, inputs) to reflect the soft navy primary and beige surfaces.
 
+### Implementation snapshot (current)
+- Light palette now lives in CSS variables: background `hsl(35, 35%, 93%)`, card `hsl(35, 33%, 96%)`, ink `hsl(200, 14%, 15%)`, primary `hsl(205, 48%, 30%)` with hover at `hsl(205, 44%, 36%)`, and muted stone accents around `hsl(39, 27%, 90–92%)`.
+- Paper grain is applied globally via `body::before` using an inline fractal-noise SVG, scaled to 360px tiles with `--texture-opacity` defaulting to `0.05`; dark mode zeroes the opacity to preserve the slate scheme.
+- Cards, inputs, and headers now draw from `bg-card`/`bg-background` overlays rather than pure white, and buttons pick up the new primary plus softened ghost/outline treatments to keep the analog feel.
+
 ## Asset & Performance Notes
 - Embed the paper texture as an inline SVG data URL to avoid extra requests; keep the pattern lightweight (~1–2 KB).
 - Verify contrast ratios meet WCAG AA on beige background (body text vs. background ≥ 4.5:1, primary buttons ≥ 3:1 for large text).
