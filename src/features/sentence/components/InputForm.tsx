@@ -94,7 +94,7 @@ export function InputForm() {
 
   const canConvert = Boolean(inputText.trim()) && !isLoading;
   const shortcutLabel =
-    isMacUser === null ? '⌘ or ⌃ + ↵' : isMacUser ? '⌘ + ↵' : '⌃ + ↵';
+    isMacUser === null ? '⌘ + ↵' : isMacUser ? '⌘ + ↵' : '⌃ + ↵';
   const ariaShortcut =
     isMacUser === null ? 'Meta+Enter Control+Enter' : isMacUser ? 'Meta+Enter' : 'Control+Enter';
 
