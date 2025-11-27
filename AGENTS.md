@@ -41,3 +41,6 @@ Per `docs/guideline.md` and `docs/clean-code.md`, default to client components (
 
 ## Testing Guidelines
 `docs/clean-code.md` sets the bar: behavior-first tests, AAA structure, single assertion focus, and coverage >80% across unit and integration suites. Co-locate specs with their features (e.g., `src/features/history/__tests__/use-sentence-history.test.ts`). Until a runner is added, plan for Vitest + Testing Library or Playwright for E2E, and record temporary gaps in your PR description.
+
+# Design Specification
+For the visual system applied across the app, see [docs/design-spec.md](docs/design-spec.md).

@@ -78,13 +78,17 @@ const config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
+        serif: [
+          'var(--font-merriweather)',
+          'Merriweather',
+          'Georgia',
+          'Times',
+          'serif',
+        ],
         sans: [
-          'Inter',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          'Segoe UI',
-          'Roboto',
-          'Helvetica Neue',
+          'var(--font-raleway)',
+          'Raleway',
+          'Helvetica',
           'Arial',
           'sans-serif',
         ],

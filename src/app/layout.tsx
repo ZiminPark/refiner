@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Merriweather, Raleway } from 'next/font/google';
 import './globals.css';
 import Providers from './providers';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const bodyFont = Merriweather({
+  variable: '--font-merriweather',
+  weight: ['300', '400', '700'],
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const accentFont = Raleway({
+  variable: '--font-raleway',
+  weight: ['400', '500', '600'],
   subsets: ['latin'],
 });
 
@@ -26,7 +28,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${bodyFont.variable} ${accentFont.variable} antialiased font-serif bg-background text-foreground`}
       >
         <Providers>{children}</Providers>
       </body>

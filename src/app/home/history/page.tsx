@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { ArrowRight, Copy, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -73,21 +74,24 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-4xl font-semibold leading-snug text-gray-800 mb-2">
-            Conversion History
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-3">
+          <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">
+            Archive
+          </p>
+          <h1 className="text-[2.5rem] font-light leading-tight text-[#333333]">
+            Conversion history
           </h1>
-          <p className="text-base leading-relaxed text-gray-600">
-            Review your past sentence conversions and track your progress.
+          <p className="text-base leading-relaxed text-secondary">
+            A clean log of what went in, what came out, and when it happened.
           </p>
         </div>
         {history.length > 0 && (
           <Button
             variant="outline"
             onClick={handleClearAll}
-            className="gap-2 text-accent-error border-accent-error hover:bg-accent-error/10"
+            className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
           >
             <Trash2 className="w-4 h-4" />
             Clear All
@@ -96,17 +100,17 @@ export default function HistoryPage() {
       </div>
 
       {history.length === 0 ? (
-        <Card className="bg-slate-50 border-slate-200">
-          <CardContent className="py-16 text-center">
-            <p className="text-lg leading-relaxed text-gray-600 mb-4">
+        <Card className="border border-border bg-white/85">
+          <CardContent className="py-16 text-center space-y-3">
+            <p className="text-lg leading-relaxed text-[#333]">
               No conversion history yet
             </p>
-            <p className="text-sm leading-relaxed text-gray-500 mb-6">
-              Start refining your sentences to build your history
+            <p className="text-sm leading-relaxed text-secondary">
+              Start refining your sentences to build your archive.
             </p>
-            <Button asChild className="bg-primary hover:bg-primary-hover">
+            <Button asChild className="px-8 font-sans text-xs uppercase tracking-[0.3em]">
               <a href="/home">
-                Start Refining
+                Start refining
                 <ArrowRight className="w-4 h-4 ml-2" />
               </a>
             </Button>
@@ -115,11 +119,14 @@ export default function HistoryPage() {
       ) : (
         <div className="space-y-4">
           {history.map((item) => (
-            <Card key={item.id} className="bg-slate-50 border-slate-200 hover:border-slate-300 transition-colors">
+            <Card
+              key={item.id}
+              className="border border-border bg-white transition-colors hover:border-foreground"
+            >
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <CardTitle className="text-sm leading-relaxed text-gray-500 font-normal mb-2">
+                    <CardTitle className="mb-2 text-sm font-normal leading-relaxed text-secondary">
                       {formatDate(item.createdAt)}
                     </CardTitle>
                   </div>
@@ -128,7 +135,9 @@ export default function HistoryPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleCopy(item.refined, item.id)}
-                      className="gap-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      className={cn(
+                        'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:border-border hover:text-foreground',
+                      )}
                     >
                       <Copy className="w-4 h-4" />
                       {copied === item.id ? 'Copied!' : 'Copy'}
@@ -137,7 +146,7 @@ export default function HistoryPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(item.id)}
-                      className="gap-2 text-accent-error hover:text-accent-error hover:bg-accent-error/10"
+                      className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.3em] text-accent-error hover:border-accent-error/60"
                     >
                       <Trash2 className="w-4 h-4" />
                       Delete
@@ -147,16 +156,16 @@ export default function HistoryPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-xs leading-normal text-gray-500 mb-1 font-semibold uppercase">
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
                     Original
                   </p>
-                  <p className="text-base leading-relaxed text-gray-700">{item.original}</p>
+                  <p className="text-base leading-relaxed text-[#444]">{item.original}</p>
                 </div>
-                <div className="pt-2 border-t border-gray-100">
-                  <p className="text-xs leading-normal text-accent-success mb-1 font-semibold uppercase">
+                <div className="border-t border-border pt-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
                     Refined
                   </p>
-                  <p className="text-base leading-relaxed text-gray-900 font-medium">
+                  <p className="text-base font-medium leading-relaxed text-[#111]">
                     {item.refined}
                   </p>
                 </div>
@@ -173,35 +182,35 @@ export default function HistoryPage() {
             variant="outline" 
             size="sm" 
             disabled 
-            className="text-gray-400 border-gray-200"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary"
           >
             Previous
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="bg-primary text-primary-foreground border-primary hover:bg-primary-hover"
+            className="border-primary bg-white text-primary hover:bg-[hsl(var(--primary-hover))] hover:text-white"
           >
             1
           </Button>
           <Button 
             variant="outline" 
             size="sm"
-            className="text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-gray-900"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
           >
             2
           </Button>
           <Button 
             variant="outline" 
             size="sm"
-            className="text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-gray-900"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
           >
             3
           </Button>
           <Button 
             variant="outline" 
             size="sm"
-            className="text-gray-700 border-gray-300 hover:bg-gray-100 hover:text-gray-900"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
           >
             Next
           </Button>

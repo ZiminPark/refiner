@@ -1,12 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useSidebarStore } from '@/hooks/useSidebarStore';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, History, Home, Menu, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 const navItems = [
   { href: '/home', label: 'Refine', icon: Home },
@@ -22,16 +22,15 @@ export function AppSidebar() {
     <>
       {/* Desktop Sidebar */}
       <aside className={cn(
-        "hidden md:flex border-r bg-gray-50 flex-col transition-all duration-300 relative h-screen",
-        isCollapsed ? "w-20" : "w-64"
+        "hidden md:flex border-r border-border bg-white/70 backdrop-blur flex-col transition-all duration-300 relative h-screen",
+        isCollapsed ? "w-20" : "w-60"
       )}>
         {/* Toggle Icon */}
-        <div className="p-4 border-b">
+        <div className="flex justify-end border-b border-border px-3 py-3">
           <button
             onClick={toggle}
             className={cn(
-              'p-2 rounded-md transition-all text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-              'flex items-center justify-center'
+              'flex h-9 w-9 items-center justify-center rounded-full border border-border text-secondary transition-colors hover:text-foreground'
             )}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
@@ -43,26 +42,23 @@ export function AppSidebar() {
           </button>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 overflow-y-auto px-2 py-6">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive ? 'default' : 'ghost'}
-                  className={cn(
-                    'w-full gap-3 transition-all',
-                    isCollapsed ? 'justify-center px-0' : 'justify-start',
-                    isActive 
-                      ? 'bg-primary text-primary-foreground hover:bg-primary-hover'
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                  )}
-                  title={isCollapsed ? item.label : undefined}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </Button>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'group flex items-center gap-3 border-l-2 border-transparent px-4 py-3 font-sans text-xs uppercase tracking-[0.3em] text-secondary transition-colors hover:border-border hover:text-foreground',
+                  isCollapsed && 'justify-center px-0',
+                  isActive && 'border-primary text-foreground'
+                )}
+                title={isCollapsed ? item.label : undefined}
+              >
+                <Icon className="w-4 h-4 flex-shrink-0" />
+                {!isCollapsed && <span>{item.label}</span>}
               </Link>
             );
           })}
@@ -75,7 +71,7 @@ export function AppSidebar() {
           <SheetTrigger asChild>
             <Button
               size="lg"
-              className="rounded-full p-2 shadow-lg bg-white/90 text-gray-900 border border-gray-200 backdrop-blur-sm flex items-center justify-center hover:bg-white"
+              className="flex items-center justify-center rounded-full border border-border bg-white/90 p-2 text-foreground backdrop-blur hover:bg-white"
               aria-label="Open menu"
             >
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary">
@@ -83,28 +79,25 @@ export function AppSidebar() {
               </div>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Menu</h2>
+          <SheetContent side="left" className="w-72 border-border bg-white p-0">
+            <div className="border-b border-border px-6 py-5">
+              <p className="font-sans text-sm uppercase tracking-[0.3em] text-secondary">Menu</p>
             </div>
-            <nav className="p-4 space-y-2">
+            <nav className="divide-y divide-border">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
                 return (
-                  <Link key={item.href} href={item.href}>
-                    <Button
-                      variant={isActive ? 'default' : 'ghost'}
-                      className={cn(
-                        'w-full justify-start gap-3',
-                        isActive 
-                          ? 'bg-primary text-primary-foreground hover:bg-primary-hover'
-                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                      )}
-                    >
-                      <Icon className="w-5 h-5" />
-                      {item.label}
-                    </Button>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-3 px-6 py-4 text-sm text-secondary transition-colors hover:text-foreground',
+                      isActive && 'text-foreground'
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="font-sans text-xs uppercase tracking-[0.3em]">{item.label}</span>
                   </Link>
                 );
               })}

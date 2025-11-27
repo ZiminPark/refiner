@@ -81,17 +81,18 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-semibold leading-snug text-gray-800 mb-2">Settings</h1>
-        <p className="text-base leading-relaxed text-gray-600">
-          Manage your account settings and preferences.
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mb-8 space-y-3">
+        <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">Workbench</p>
+        <h1 className="text-[2.5rem] font-light leading-tight text-[#333333]">Settings</h1>
+        <p className="text-base leading-relaxed text-secondary">
+          Manage prompts, preferences, and the practical details that keep refining calm.
         </p>
       </div>
 
       <div className="space-y-6">
         {/* Prompt Configuration */}
-        <Card className="bg-slate-50 border-slate-200">
+        <Card className="border border-border bg-white/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-primary" />
@@ -113,7 +114,7 @@ export default function SettingsPage() {
                 value={promptDraft}
                 onChange={(event) => setPromptDraft(event.target.value)}
                 rows={8}
-                className="text-base leading-relaxed bg-white border-slate-200 text-slate-900"
+                className="text-base leading-relaxed"
               />
             </div>
             <p className="text-sm leading-relaxed text-gray-500">
@@ -125,7 +126,7 @@ export default function SettingsPage() {
                 variant="outline"
                 size="default"
                 onClick={() => setPromptDraft(defaultPrompt)}
-                className="w-full sm:w-auto border-slate-300 text-slate-700 hover:bg-slate-50"
+                className="w-full sm:w-auto border-border font-sans text-[0.75rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
               >
                 Reset to Default
               </Button>
@@ -134,7 +135,7 @@ export default function SettingsPage() {
                 size="default"
                 onClick={handlePromptSave}
                 disabled={!isPromptDirty}
-                className="w-full sm:w-auto bg-primary text-primary-foreground shadow-md hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[140px]"
+                className="w-full sm:w-auto px-8 font-sans text-[0.75rem] uppercase tracking-[0.3em] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {promptSaved && !isPromptDirty ? (
                   <>
@@ -153,7 +154,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Profile Section */}
-        <Card className="bg-slate-50 border-slate-200">
+        <Card className="border border-border bg-white/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <User className="w-5 h-5 text-primary" />
@@ -175,7 +176,11 @@ export default function SettingsPage() {
                     .join('')}
                 </AvatarFallback>
               </Avatar>
-              <Button variant="outline" size="sm">
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+              >
                 Change Avatar
               </Button>
             </div>
@@ -208,7 +213,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Preferences Section */}
-        <Card className="bg-slate-50 border-slate-200">
+        <Card className="border border-border bg-white/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <Palette className="w-5 h-5 text-primary" />
@@ -281,7 +286,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notifications Section */}
-        <Card className="bg-slate-50 border-slate-200">
+        <Card className="border border-border bg-white/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <Bell className="w-5 h-5 text-primary" />
@@ -335,7 +340,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Account Management */}
-        <Card className="bg-slate-50 border-slate-200">
+        <Card className="border border-border bg-white/85">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold leading-relaxed">
               Account Management
@@ -345,7 +350,10 @@ export default function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto font-sans text-[0.75rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+            >
               Change Password
             </Button>
             <Separator />
@@ -353,7 +361,7 @@ export default function SettingsPage() {
               <p className="text-sm font-semibold text-gray-700">Danger Zone</p>
               <Button
                 variant="outline"
-                className="w-full sm:w-auto text-accent-error border-accent-error hover:bg-accent-error/10"
+                className="w-full sm:w-auto border border-accent-error text-[0.75rem] font-sans uppercase tracking-[0.3em] text-accent-error hover:bg-accent-error/5"
               >
                 Delete Account
               </Button>
@@ -363,10 +371,12 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end gap-3">
-          <Button variant="outline">Cancel</Button>
+          <Button variant="outline" className="font-sans text-[0.75rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground">
+            Cancel
+          </Button>
           <Button
             onClick={handleSettingsSave}
-            className="bg-primary hover:bg-primary-hover text-primary-foreground gap-2"
+            className="gap-2 px-8 font-sans text-[0.75rem] uppercase tracking-[0.3em]"
           >
             <Save className="w-4 h-4" />
             {settingsSaved ? 'Settings Saved!' : 'Save Changes'}

@@ -192,11 +192,11 @@ export function InputForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 text-foreground">
       {/* Input Form */}
-      <Card className="bg-slate-50 border-slate-200">
+      <Card className="border border-border bg-white/90">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold leading-relaxed text-slate-800">
+          <CardTitle className="text-[1.5rem] font-light leading-snug text-[#333333]">
             Enter Your Sentence
           </CardTitle>
         </CardHeader>
@@ -205,7 +205,7 @@ export function InputForm() {
             placeholder="Type or paste your sentence here..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            className="min-h-[120px] text-base leading-relaxed bg-white border-slate-200 text-slate-900 placeholder:text-gray-400"
+            className="min-h-[180px]"
             disabled={isLoading}
             ref={textareaRef}
           />
@@ -219,8 +219,7 @@ export function InputForm() {
           <Button
             onClick={handleConvert}
             disabled={!canConvert}
-            size="lg"
-            className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-primary-foreground"
+            className="w-full sm:w-auto px-8 font-sans text-xs uppercase tracking-[0.35em]"
             aria-keyshortcuts={ariaShortcut}
           >
             {isLoading ? (
@@ -236,7 +235,7 @@ export function InputForm() {
               </>
             )}
           </Button>
-          <div className="space-y-1 text-sm text-slate-500">
+          <div className="space-y-1 text-sm text-secondary">
             <p>
               Press <span className="font-semibold">{shortcutLabel}</span> to refine instantly.
             </p>
@@ -250,26 +249,28 @@ export function InputForm() {
       {/* Conversion Result */}
       {converted && (
         <div className="space-y-4">
-          <Card className="bg-slate-50 border-slate-200">
+          <Card className="border border-border bg-white/80">
             <CardHeader className="pb-3">
-              <CardTitle className="text-xl font-semibold text-slate-800">Original</CardTitle>
+              <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-secondary">
+                Original
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-base leading-relaxed text-slate-700">{converted.original}</p>
+              <p className="text-base leading-relaxed text-[#444444]">{converted.original}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-emerald-50/50 border-accent-success">
+          <Card className="border border-primary/30 bg-white">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
-                <CardTitle className="text-xl font-semibold text-accent-success">
+                <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-primary">
                   Refined Version
                 </CardTitle>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleCopy}
-                  className="gap-2 border-accent-success/30 hover:bg-accent-success/10"
+                  className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
                 >
                   {copied ? (
                     <>
@@ -286,17 +287,17 @@ export function InputForm() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="text-base leading-relaxed text-slate-900 font-medium mb-4">
+              <p className="mb-4 text-base font-medium leading-relaxed text-[#111111]">
                 {converted.refined}
               </p>
               
               {/* Explanation Section */}
               {converted.explanation && (
                 <div className="mt-4 pt-4 border-t border-accent-success/20">
-                  <h4 className="text-sm font-semibold text-slate-700 mb-2">
+                  <h4 className="mb-2 text-sm font-semibold text-secondary">
                     What Changed?
                   </h4>
-                  <p className="text-sm leading-relaxed text-slate-600">
+                  <p className="text-sm leading-relaxed text-secondary">
                     {converted.explanation}
                   </p>
                 </div>
@@ -304,13 +305,13 @@ export function InputForm() {
               
               {/* Feedback Section */}
               <div className="pt-4 border-t border-accent-success/20 mt-4">
-                <p className="text-sm leading-relaxed text-slate-600 mb-3">Was this helpful?</p>
+                <p className="mb-3 text-sm leading-relaxed text-secondary">Was this helpful?</p>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleFeedback(true)}
-                    className="gap-2 hover:bg-accent-success/10"
+                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] hover:text-foreground"
                   >
                     <ThumbsUp className="w-4 h-4" />
                     Yes
@@ -319,7 +320,7 @@ export function InputForm() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleFeedback(false)}
-                    className="gap-2 hover:bg-red-50"
+                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] hover:text-foreground"
                   >
                     <ThumbsDown className="w-4 h-4" />
                     No
@@ -333,9 +334,11 @@ export function InputForm() {
 
       {/* Example Sentences */}
       {!converted && (
-        <Card className="bg-gray-50 border-gray-200">
+        <Card className="border border-border bg-white/80">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold text-slate-800">Example Sentences</CardTitle>
+            <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-secondary">
+              Example Sentences
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <ExampleItem
@@ -353,6 +356,7 @@ export function InputForm() {
           </CardContent>
         </Card>
       )}
+
     </div>
   );
 }
@@ -361,9 +365,9 @@ function ExampleItem({ text, onClick }: { text: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left p-3 rounded-lg bg-white border border-slate-200 hover:border-primary hover:bg-primary/5 transition-colors"
+      className="w-full border-l-2 border-border px-4 py-3 text-left transition-colors hover:border-primary"
     >
-      <p className="text-sm leading-relaxed text-slate-700">{text}</p>
+      <p className="text-sm leading-relaxed text-[#444444]">{text}</p>
     </button>
   );
 }

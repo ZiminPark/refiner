@@ -1,159 +1,199 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, History, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+
+const navLinks = [
+  { href: '/home', label: 'App' },
+  { href: '/home/history', label: 'History' },
+  { href: '/home/settings', label: 'Settings' },
+  { href: 'https://eugeneyan.com/', label: 'Inspiration', external: true },
+];
+
+const stats = [
+  { value: '118,204', label: 'Sentences refined' },
+  { value: '38', label: 'Prompt variations iterated' },
+  { value: '2.3s', label: 'Average turnaround time' },
+];
+
+const updates = [
+  {
+    date: '23 Nov 2025',
+    title: 'Layered explanations for every suggestion',
+    summary:
+      'Each refinement now ships with rationale inspired by long-form essays so you can see the “why” behind the change.',
+  },
+  {
+    date: '19 Oct 2025',
+    title: 'New timeline view in your history',
+    summary:
+      'Scroll-friendly history mirrors a writing log, making it easier to revisit rough drafts and polished phrasing.',
+  },
+  {
+    date: '14 Sep 2025',
+    title: 'Semantic slots for tone & intent',
+    summary:
+      'Prototype work allows you to hint at tone (direct, warm, succinct) much like annotating an outline.',
+  },
+];
+
+const resources = [
+  { label: 'Pattern Library', description: 'Examples of polished emails, memos, and essays to emulate.', href: '/home/history' },
+  { label: 'Prompt Settings', description: 'Curate the default instructions the refiner uses.', href: '/home/settings' },
+  { label: 'Working Notes', description: 'A living document on what we are learning about corrections.', href: '/home' },
+  { label: 'Release Journal', description: 'Changelog with human-readable summaries, no patch numbers.', href: '/home/history' },
+];
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-bold text-gray-900">English Refiner</h1>
-          </div>
-          <Link href="/home">
-            <Button className="bg-primary hover:bg-primary-hover text-primary-foreground">
-              Try Now <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border bg-white/80 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+          <Link
+            href="/"
+            className="font-sans text-sm uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+          >
+            English Refiner
+          </Link>
+          <nav className="hidden items-center gap-6 text-xs font-sans uppercase tracking-[0.25em] text-secondary md:flex">
+            {navLinks.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition-colors hover:text-foreground"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
+                  {link.label}
+                </Link>
+              ),
+            )}
+          </nav>
+          <Link
+            href="/home"
+            className="font-sans text-xs uppercase tracking-[0.25em] text-primary"
+          >
+            Launch App →
           </Link>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 md:py-32">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
-            <span className="text-sm font-semibold text-primary">AI-Powered English Refinement</span>
-          </div>
-          <h1 className="text-5xl font-bold leading-tight text-gray-900 sm:text-6xl">
-            Refine Your English
-            <br />
-            <span className="text-primary">Instantly & Naturally</span>
-          </h1>
-          <p className="text-lg leading-relaxed text-gray-600 max-w-2xl mx-auto">
-            Transform your sentences into natural, grammatically correct American English. 
-            Perfect for students learning English and professionals crafting important communications.
+      <main className="mx-auto max-w-5xl px-6 py-16 space-y-16">
+        <section className="space-y-6">
+          <p className="font-sans text-xs uppercase tracking-[0.35em] text-secondary">
+            AI-powered sentence refinement
           </p>
-          <div className="flex gap-4 justify-center pt-4">
-            <Link href="/home">
-              <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground text-base font-semibold">
-                Get Started Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
+          <h1 className="text-[2.5rem] leading-snug text-[#333333] sm:text-[3rem]">
+            Hi, we&apos;re building a calmer way to polish American English.
+          </h1>
+          <p className="text-lg text-secondary leading-relaxed">
+            Instead of neon gradients and flashing widgets, the refiner mirrors a thoughtful newsletter:
+            serif body text, generous whitespace, and deliberate pacing. Paste a sentence, get a refined
+            version with rationale, save it for later. That&apos;s it.
+          </p>
+          <div className="flex flex-wrap items-center gap-4 text-sm font-sans uppercase tracking-[0.3em] text-secondary">
+            <Link
+              href="/home"
+              className="inline-flex items-center border border-border px-5 py-3 text-[0.85rem] tracking-[0.25em] hover:text-foreground hover:border-foreground transition-colors"
+            >
+              Try the refiner
+            </Link>
+            <Link
+              href="/home/settings"
+              className="inline-flex items-center text-[0.85rem] hover:text-foreground transition-colors"
+            >
+              Configure prompts
+            </Link>
+          </div>
+        </section>
+
+        <section className="grid gap-6 border-t border-b border-border py-8 text-sm font-sans uppercase tracking-[0.25em] text-secondary sm:grid-cols-3">
+          {stats.map((item) => (
+            <div key={item.label} className="space-y-2">
+              <p className="text-3xl font-light tracking-tight text-[#111]">{item.value}</p>
+              <p className="text-xs">{item.label}</p>
+            </div>
+          ))}
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-[2rem] leading-tight text-[#333]">Latest notes</h2>
+            <Link href="/home/history" className="font-sans text-xs uppercase tracking-[0.3em] text-secondary hover:text-foreground">
+              View history
+            </Link>
+          </div>
+          <div className="divide-y divide-border border border-border">
+            {updates.map((item) => (
+              <article key={item.title} className="grid gap-4 px-5 py-6 md:grid-cols-[160px_1fr]">
+                <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">{item.date}</p>
+                <div className="space-y-2">
+                  <h3 className="text-xl text-[#333]">{item.title}</h3>
+                  <p className="text-base text-secondary leading-relaxed">{item.summary}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <h2 className="text-[2rem] leading-tight text-[#333]">Resources we keep close</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {resources.map((resource) => (
+              <Link
+                key={resource.label}
+                href={resource.href}
+                className="group border border-border px-5 py-6 transition-colors hover:border-foreground"
+              >
+                <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary group-hover:text-foreground">
+                  {resource.label}
+                </p>
+                <p className="mt-2 text-base text-[#333] leading-relaxed">{resource.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-4 border-t border-border pt-10">
+          <p className="font-sans text-xs uppercase tracking-[0.35em] text-secondary">A quiet newsletter</p>
+          <p className="text-lg text-secondary leading-relaxed">
+            Once a month we send a small roundup: what&apos;s shipped, a prompt tweak worth trying, and
+            a favorite sentence spotted in the wild. It&apos;s the same calm pacing you see here.
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input
+              type="email"
+              placeholder="Your email address..."
+              className="w-full border border-border px-4 py-3 text-base text-foreground placeholder:text-secondary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+            />
+            <button className="inline-flex items-center justify-center border border-border px-6 py-3 font-sans text-xs uppercase tracking-[0.3em] text-white bg-primary hover:bg-[hsl(var(--primary-hover))]">
+              Subscribe
+            </button>
+          </div>
+          <p className="text-sm text-secondary">
+            No spam. Just a note and maybe a prototype link.
+          </p>
+        </section>
+      </main>
+
+      <footer className="border-t border-border bg-white">
+        <div className="mx-auto flex max-w-5xl flex-col gap-4 px-6 py-8 text-sm text-secondary md:flex-row md:items-center md:justify-between">
+          <p>© {new Date().getFullYear()} English Refiner. Crafted with a serif-first palette.</p>
+          <div className="flex gap-6 font-sans text-xs uppercase tracking-[0.3em]">
+            <Link href="/home" className="hover:text-foreground">
+              App
+            </Link>
+            <Link href="/home/history" className="hover:text-foreground">
+              History
+            </Link>
+            <Link href="/home/settings" className="hover:text-foreground">
+              Settings
             </Link>
           </div>
         </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-semibold leading-snug text-gray-800 text-center mb-12">
-            Why Choose English Refiner?
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={<CheckCircle className="w-8 h-8 text-accent-success" />}
-              title="Grammar Correction"
-              description="Automatically detect and fix grammatical errors in your sentences."
-            />
-            <FeatureCard
-              icon={<Sparkles className="w-8 h-8 text-primary" />}
-              title="Natural Phrasing"
-              description="Convert your sentences to sound natural and fluent in American English."
-            />
-            <FeatureCard
-              icon={<History className="w-8 h-8 text-accent-info" />}
-              title="Conversion History"
-              description="Keep track of all your past conversions for easy reference and learning."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="container mx-auto px-4 py-20">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-semibold leading-snug text-gray-800 text-center mb-12">
-            How It Works
-          </h2>
-          <div className="space-y-6">
-            <StepCard number={1} title="Enter Your Sentence" description="Type or paste the sentence you want to refine" />
-            <StepCard number={2} title="Click Convert" description="Our AI analyzes and refines your sentence instantly" />
-            <StepCard number={3} title="Review & Learn" description="Compare the original and refined versions to improve your English" />
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-20 bg-primary/5">
-        <div className="max-w-3xl mx-auto text-center space-y-6">
-          <h2 className="text-4xl font-semibold leading-snug text-gray-800">
-            Ready to Improve Your English?
-          </h2>
-          <p className="text-lg leading-relaxed text-gray-600">
-            Start refining your sentences now and communicate with confidence.
-          </p>
-          <Link href="/home">
-            <Button size="lg" className="bg-primary hover:bg-primary-hover text-primary-foreground text-base font-semibold">
-              Start Refining
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t bg-gray-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              <span className="text-sm leading-relaxed text-gray-500">
-                © 2025 English Refiner. All rights reserved.
-              </span>
-            </div>
-            <div className="flex gap-6">
-              <Link href="/home" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
-                App
-              </Link>
-              <Link href="/home/history" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
-                History
-              </Link>
-              <Link href="/home/settings" className="text-sm leading-relaxed text-gray-500 hover:text-primary">
-                Settings
-              </Link>
-            </div>
-          </div>
-        </div>
       </footer>
-    </div>
-  );
-}
-
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <div className="bg-white p-6 rounded-lg border border-gray-200 hover:border-primary/50 transition-colors">
-      <div className="mb-4">{icon}</div>
-      <h3 className="text-2xl font-semibold leading-relaxed mb-2 text-gray-900">{title}</h3>
-      <p className="text-base leading-relaxed text-gray-600">{description}</p>
-    </div>
-  );
-}
-
-function StepCard({ number, title, description }: { number: number; title: string; description: string }) {
-  return (
-    <div className="flex items-start gap-4">
-      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
-        {number}
-      </div>
-      <div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-1">{title}</h3>
-        <p className="text-base leading-relaxed text-gray-600">{description}</p>
-      </div>
     </div>
   );
 }

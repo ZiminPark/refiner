@@ -4,13 +4,16 @@ import { InputForm } from '@/features/sentence/components/InputForm';
 
 export default function AppPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-semibold leading-snug text-gray-800 mb-2">
-          Refine Your English
+    <div className="mx-auto max-w-5xl px-6 py-10">
+      <div className="mb-8 space-y-3">
+        <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">
+          Workspace
+        </p>
+        <h1 className="text-[2.5rem] font-light leading-tight text-[#333333]">
+          Refine your English
         </h1>
-        <p className="text-base leading-relaxed text-gray-600">
-          Enter your sentence below and get instant, natural American English suggestions.
+        <p className="text-base leading-relaxed text-secondary">
+          Paste a sentence below and receive a calmer, evidence-backed suggestion in seconds.
         </p>
       </div>
 
