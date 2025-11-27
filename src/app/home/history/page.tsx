@@ -77,10 +77,10 @@ export default function HistoryPage() {
     <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-3">
-          <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">
+          <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">
             Archive
           </p>
-          <h1 className="text-[2.5rem] font-light leading-tight text-[#333333]">
+          <h1 className="text-[2.5rem] font-light leading-tight text-foreground">
             Conversion history
           </h1>
           <p className="text-base leading-relaxed text-secondary">
@@ -91,7 +91,7 @@ export default function HistoryPage() {
           <Button
             variant="outline"
             onClick={handleClearAll}
-            className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+            className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
           >
             <Trash2 className="w-4 h-4" />
             Clear All
@@ -100,15 +100,15 @@ export default function HistoryPage() {
       </div>
 
       {history.length === 0 ? (
-        <Card className="border border-border bg-white/85">
-          <CardContent className="py-16 text-center space-y-3">
-            <p className="text-lg leading-relaxed text-[#333]">
+        <Card className="border border-border bg-card/85">
+          <CardContent className="space-y-3 py-16 text-center">
+            <p className="text-lg leading-relaxed text-foreground">
               No conversion history yet
             </p>
             <p className="text-sm leading-relaxed text-secondary">
               Start refining your sentences to build your archive.
             </p>
-            <Button asChild className="px-8 font-sans text-xs uppercase tracking-[0.3em]">
+            <Button asChild className="px-8 font-sans text-xs uppercase tracking-[0.28em]">
               <a href="/home">
                 Start refining
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -121,7 +121,7 @@ export default function HistoryPage() {
           {history.map((item) => (
             <Card
               key={item.id}
-              className="border border-border bg-white transition-colors hover:border-foreground"
+              className="border border-border bg-card transition-colors hover:border-foreground"
             >
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
@@ -136,7 +136,7 @@ export default function HistoryPage() {
                       size="sm"
                       onClick={() => handleCopy(item.refined, item.id)}
                       className={cn(
-                        'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:border-border hover:text-foreground',
+                        'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground',
                       )}
                     >
                       <Copy className="w-4 h-4" />
@@ -146,7 +146,7 @@ export default function HistoryPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDelete(item.id)}
-                      className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.3em] text-accent-error hover:border-accent-error/60"
+                      className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-accent-error hover:border-accent-error/60"
                     >
                       <Trash2 className="w-4 h-4" />
                       Delete
@@ -159,13 +159,13 @@ export default function HistoryPage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
                     Original
                   </p>
-                  <p className="text-base leading-relaxed text-[#444]">{item.original}</p>
+                  <p className="text-base leading-relaxed text-foreground/80">{item.original}</p>
                 </div>
                 <div className="border-t border-border pt-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
                     Refined
                   </p>
-                  <p className="text-base font-medium leading-relaxed text-[#111]">
+                  <p className="text-base font-medium leading-relaxed text-foreground">
                     {item.refined}
                   </p>
                 </div>
@@ -178,39 +178,39 @@ export default function HistoryPage() {
       {/* Pagination (UI only) */}
       {history.length > 0 && (
         <div className="mt-8 flex justify-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            disabled 
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary"
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary"
           >
             Previous
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="border-primary bg-white text-primary hover:bg-[hsl(var(--primary-hover))] hover:text-white"
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-primary bg-card text-primary hover:bg-[hsl(var(--primary-hover))] hover:text-primary-foreground"
           >
             1
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
           >
             2
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
           >
             3
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="sm"
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
           >
             Next
           </Button>

@@ -84,7 +84,7 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8 space-y-3">
         <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">Workbench</p>
-        <h1 className="text-[2.5rem] font-light leading-tight text-[#333333]">Settings</h1>
+        <h1 className="text-[2.5rem] font-light leading-tight text-foreground">Settings</h1>
         <p className="text-base leading-relaxed text-secondary">
           Manage prompts, preferences, and the practical details that keep refining calm.
         </p>
@@ -92,7 +92,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {/* Prompt Configuration */}
-        <Card className="border border-border bg-white/85">
+        <Card className="border border-border bg-card/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-primary" />
@@ -154,7 +154,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Profile Section */}
-        <Card className="border border-border bg-white/85">
+        <Card className="border border-border bg-card/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <User className="w-5 h-5 text-primary" />
@@ -213,7 +213,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Preferences Section */}
-        <Card className="border border-border bg-white/85">
+        <Card className="border border-border bg-card/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <Palette className="w-5 h-5 text-primary" />
@@ -286,7 +286,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notifications Section */}
-        <Card className="border border-border bg-white/85">
+        <Card className="border border-border bg-card/85">
           <CardHeader>
             <div className="flex items-center gap-3">
               <Bell className="w-5 h-5 text-primary" />
@@ -340,7 +340,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Account Management */}
-        <Card className="border border-border bg-white/85">
+        <Card className="border border-border bg-card/85">
           <CardHeader>
             <CardTitle className="text-2xl font-semibold leading-relaxed">
               Account Management

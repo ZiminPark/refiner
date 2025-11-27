@@ -194,7 +194,7 @@ export function InputForm() {
   return (
     <div className="space-y-8 text-foreground">
       {/* Input Form */}
-      <Card className="border border-border bg-white/90">
+      <Card className="border border-border bg-card/90">
         <CardContent className="space-y-5 pt-6">
           <Textarea
             placeholder="Type or paste your sentence here..."
@@ -242,7 +242,7 @@ export function InputForm() {
       {/* Conversion Result */}
       {converted && (
         <div className="space-y-4">
-          <Card className="border border-primary/30 bg-white">
+          <Card className="border border-primary/25 bg-card">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-center">
                 <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-primary">
@@ -269,7 +269,7 @@ export function InputForm() {
               </div>
             </CardHeader>
             <CardContent>
-              <p className="mb-4 text-base font-medium leading-relaxed text-[#111111]">
+              <p className="mb-4 text-base font-medium leading-relaxed text-foreground">
                 {converted.refined}
               </p>
               

@@ -4,48 +4,51 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 210 11% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 210 11% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 11% 15%;
+    --background: 35 35% 93%;
+    --foreground: 200 14% 15%;
+    --card: 35 33% 96%;
+    --card-foreground: 200 14% 15%;
+    --popover: 35 35% 93%;
+    --popover-foreground: 200 14% 15%;
 
-    --primary: 211 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-hover: 211 100% 44%;
-    --primary-active: 211 100% 38%;
+    --primary: 205 48% 30%;
+    --primary-foreground: 35 33% 96%;
+    --primary-hover: 205 44% 36%;
+    --primary-active: 205 48% 24%;
 
-    --secondary: 208 7% 46%;
+    --secondary: 207 5% 45%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 208 7% 34%;
-    --secondary-active: 208 7% 28%;
+    --secondary-hover: 207 5% 40%;
+    --secondary-active: 207 5% 34%;
 
-    --accent: 210 17% 96%;
-    --accent-foreground: 210 10% 32%;
-    --accent-success: 160 84% 39%;
+    --accent: 39 27% 90%;
+    --accent-foreground: 205 12% 30%;
+    --accent-success: 160 70% 38%;
     --accent-success-foreground: 0 0% 100%;
-    --accent-warning: 38 92% 50%;
-    --accent-warning-foreground: 217 33% 17%;
-    --accent-error: 0 84% 60%;
+    --accent-warning: 38 86% 52%;
+    --accent-warning-foreground: 205 12% 18%;
+    --accent-error: 0 78% 58%;
     --accent-error-foreground: 0 0% 100%;
-    --accent-info: 211 100% 50%;
-    --accent-info-foreground: 0 0% 100%;
+    --accent-info: 205 48% 30%;
+    --accent-info-foreground: 35 33% 96%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 68% 56%;
     --destructive-foreground: 0 0% 100%;
-    --muted: 210 17% 96%;
-    --muted-foreground: 210 9% 38%;
-    --border: 210 14% 89%;
-    --input: 210 14% 89%;
-    --ring: 211 100% 50%;
+    --muted: 39 27% 92%;
+    --muted-foreground: 205 9% 32%;
+    --border: 39 20% 80%;
+    --input: 39 20% 80%;
+    --ring: 205 48% 30%;
     --radius: 0.25rem;
 
-    --chart-1: 211 100% 50%;
-    --chart-2: 210 10% 32%;
-    --chart-3: 208 7% 46%;
-    --chart-4: 211 100% 44%;
-    --chart-5: 0 84% 60%;
+    --chart-1: 205 48% 30%;
+    --chart-2: 205 28% 46%;
+    --chart-3: 207 5% 45%;
+    --chart-4: 39 27% 90%;
+    --chart-5: 0 78% 58%;
+
+    --texture-opacity: 0.05;
+    --texture-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.45'/%3E%3C/svg%3E");
   }
 
   .dark {
@@ -90,6 +93,8 @@
     --chart-3: 210 17% 82%;
     --chart-4: 210 17% 74%;
     --chart-5: 0 78% 65%;
+
+    --texture-opacity: 0;
   }
 }
 
@@ -99,5 +104,25 @@
   }
   body {
     @apply bg-background text-foreground font-serif leading-relaxed tracking-tight antialiased;
+    background-color: hsl(var(--background));
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: hsl(var(--background));
+    background-image: var(--texture-image);
+    background-repeat: repeat;
+    background-size: 360px 360px;
+    opacity: var(--texture-opacity);
+    mix-blend-mode: multiply;
+  }
+
+  .texture-none {
+    --texture-opacity: 0;
   }
 }
