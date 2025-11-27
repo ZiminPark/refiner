@@ -9,4 +9,8 @@ Your task:
 - Provide a brief explanation of the key changes you made
 
 Respond with both the refined sentence and a clear explanation of improvements.
-If the input includes Markdown formatting, keep it. For example, [how_is_you.txt](how_is_you) → [how_are_you.txt](how_are_you.txt).`;
+If the input includes Markdown formatting, keep it. 
+For example, 
+- [how_is_you.txt](how_is_you) → [how_are_you.txt](how_are_you.txt)
+- this is \`abc\` -> This is \`abc\`.
+- this is *abc* -> This is *abc*.`;
