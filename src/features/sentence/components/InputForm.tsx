@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowRight, Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
 import { useToast } from '@/hooks/use-toast';
@@ -195,12 +195,7 @@ export function InputForm() {
     <div className="space-y-8 text-foreground">
       {/* Input Form */}
       <Card className="border border-border bg-white/90">
-        <CardHeader>
-          <CardTitle className="text-[1.5rem] font-light leading-snug text-[#333333]">
-            Enter Your Sentence
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-5 pt-6">
           <Textarea
             placeholder="Type or paste your sentence here..."
             value={inputText}
@@ -219,29 +214,27 @@ export function InputForm() {
           <Button
             onClick={handleConvert}
             disabled={!canConvert}
-            className="w-full sm:w-auto px-8 font-sans text-xs uppercase tracking-[0.35em]"
+            className="w-full sm:w-auto justify-center gap-2 px-8 font-sans text-xs uppercase tracking-[0.35em]"
             aria-keyshortcuts={ariaShortcut}
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
                 Converting...
               </>
             ) : (
               <>
-                <Sparkles className="w-5 h-5 mr-2" />
-                Refine Sentence
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <Sparkles className="w-5 h-5" />
+                Refine
               </>
             )}
           </Button>
-          <div className="space-y-1 text-sm text-secondary">
-            <p>
-              Press <span className="font-semibold">{shortcutLabel}</span> to refine instantly.
-            </p>
-            <p>
-              Press <span className="font-semibold">/</span> to jump to the input box.
-            </p>
+
+          <div className="space-y-2 text-xs text-muted-foreground">
+            <div className="flex flex-wrap gap-3">
+              <ShortcutHint label={shortcutLabel} description="Refine instantly" />
+              <ShortcutHint label="/" description="Jump to input" />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -337,13 +330,18 @@ export function InputForm() {
   );
 }
 
-function ExampleItem({ text, onClick }: { text: string; onClick: () => void }) {
+type ShortcutHintProps = {
+  label: string;
+  description: string;
+};
+
+function ShortcutHint({ label, description }: ShortcutHintProps) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full border-l-2 border-border px-4 py-3 text-left transition-colors hover:border-primary"
-    >
-      <p className="text-sm leading-relaxed text-[#444444]">{text}</p>
-    </button>
+    <div className="flex items-center gap-2">
+      <span className="rounded-md border border-border bg-background px-2 py-0.5 font-semibold text-foreground">
+        {label}
+      </span>
+      <span className="text-muted-foreground">{description}</span>
+    </div>
   );
 }
