@@ -332,30 +332,6 @@ export function InputForm() {
         </div>
       )}
 
-      {/* Example Sentences */}
-      {!converted && (
-        <Card className="border border-border bg-white/80">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-secondary">
-              Example Sentences
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <ExampleItem
-              text="I'm gonna finish this project tomorrow"
-              onClick={() => setInputText("I'm gonna finish this project tomorrow")}
-            />
-            <ExampleItem
-              text="He don't know how to solve this problem"
-              onClick={() => setInputText("He don't know how to solve this problem")}
-            />
-            <ExampleItem
-              text="We was planning to meet at 3pm"
-              onClick={() => setInputText("We was planning to meet at 3pm")}
-            />
-          </CardContent>
-        </Card>
-      )}
 
     </div>
   );
