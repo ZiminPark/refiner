@@ -3,12 +3,15 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, Copy, Loader2, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { usePromptSetting } from '@/hooks/usePromptSetting';
 import { useToast } from '@/hooks/use-toast';
+import { usePromptSetting } from '@/hooks/usePromptSetting';
+import { Check, Copy, Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
+
+const shortcutKeyClassName =
+  'inline-flex items-center rounded-[3px] border border-border bg-background/70 px-2 py-0.5 font-mono text-[0.65rem] font-semibold tracking-[0.15em] text-muted-foreground';
 
 export function InputForm() {
   const [inputText, setInputText] = useState('');
@@ -91,7 +94,7 @@ export function InputForm() {
 
   const canConvert = Boolean(inputText.trim()) && !isLoading;
   const shortcutLabel =
-    isMacUser === null ? 'Cmd or Ctrl + Enter' : isMacUser ? 'Cmd + Enter' : 'Ctrl + Enter';
+    isMacUser === null ? '⌘ or ⌃ + ↵' : isMacUser ? '⌘ + ↵' : '⌃ + ↵';
   const ariaShortcut =
     isMacUser === null ? 'Meta+Enter Control+Enter' : isMacUser ? 'Meta+Enter' : 'Control+Enter';
 
@@ -214,7 +217,7 @@ export function InputForm() {
           <Button
             onClick={handleConvert}
             disabled={!canConvert}
-            className="w-full sm:w-auto justify-center gap-2 px-8 font-sans text-xs uppercase tracking-[0.35em]"
+            className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
             aria-keyshortcuts={ariaShortcut}
           >
             {isLoading ? (
@@ -223,16 +226,18 @@ export function InputForm() {
                 Converting...
               </>
             ) : (
-              <>
-                <Sparkles className="w-5 h-5" />
-                Refine
-              </>
+                <>
+                  <span>Refine</span>
+                  <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
+                    <span className={shortcutKeyClassName}>{shortcutLabel}</span>
+                  </span>
+                </>
             )}
           </Button>
 
           <div className="space-y-2 text-xs text-muted-foreground">
             <div className="flex flex-wrap gap-3">
-              <ShortcutHint label={shortcutLabel} description="Refine instantly" />
+              
               <ShortcutHint label="/" description="Jump to input" />
             </div>
           </div>
@@ -326,10 +331,8 @@ type ShortcutHintProps = {
 
 function ShortcutHint({ label, description }: ShortcutHintProps) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="rounded-md border border-border bg-background px-2 py-0.5 font-semibold text-foreground">
-        {label}
-      </span>
+    <div className="flex items-center gap-2 text-xs">
+      <span className={shortcutKeyClassName}>{label}</span>
       <span className="text-muted-foreground">{description}</span>
     </div>
   );

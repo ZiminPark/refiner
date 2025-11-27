@@ -1,67 +1,52 @@
-# Design Specification
+# Design Refresh Plan: Calm, Analog-Inspired Look
 
-## Overview
-This document captures the calm, editorial-inspired interface. The aim is to give every screen a “long-form newsletter” vibe: serif-driven body text, restrained palettes, and layout decisions that rely on whitespace rather than gradients or cards with heavy elevation.
+## Goals
+- Evoke an intelligent, editorial feel reminiscent of an analog book.
+- Introduce a subtle beige backdrop with light paper texture while keeping readability and accessibility in focus.
+- Align primary actions and accents with a softened, confident hue that complements the background.
 
-## Foundations
-### Typography
-- **Body/Headings:** `Merriweather` (`font-serif`, weights 300/400/700) for all prose, with leading set around 1.5 for readability.
-- **Accents & Navigation:** `Raleway` (`font-sans`, weights 400–600) reserved for uppercase labels, counts, and controls that need a subtle sans-serif contrast.
-- **Usage Tips:** Keep uppercase tracking between `0.25em` and `0.35em` on nav + metadata. Headlines (H1/H2) should stay ≤ 3rem to avoid overpowering the text blocks.
+## Palette Updates
+- **Background:** Warm beige `#f7f1e8` (HSL 35, 35%, 93%) as the base page color.
+- **Foreground/Text:** Deep ink `#1f2629` (HSL 200, 14%, 15%) to retain strong contrast.
+- **Primary:** Soft navy `#264e70` (HSL 205, 48%, 30%) for CTA fills, focus rings, and key links.
+- **Secondary/Muted:** Stone gray `#6d7378` for metadata; light stone `#ece7de` for borders and subtle fills.
+- **Success/Warning/Error:** Keep existing status hues but desaturate by ~10% to stay in the calm spectrum.
 
-### Color Palette
-| Token | HSL | Usage |
-| --- | --- | --- |
-| `--background` | `0 0% 100%` | Page background |
-| `--foreground` | `210 11% 15%` | Primary body text |
-| `--primary` | `211 100% 50%` | Action blue (buttons, key links) |
-| `--secondary` | `208 7% 46%` | Muted copy, timestamps, nav |
-| `--accent` | `210 17% 96%` | Subtle fills on hover states |
-| `--border` | `210 14% 89%` | Divider + card edges |
-| `--muted` | `210 17% 96%` | Card backdrops and inert surfaces |
-| `--accent-success/info/...` | Mirror existing design tokens for status messaging, but keep saturation low unless communicating errors. |
+## Background Texture Strategy
+- Use a **tileable paper grain** SVG overlay at low opacity (4–6%) to avoid heavy noise while reinforcing the analog cue.
+- Apply texture globally via `body::before` (fixed, pointer-events none) so content remains crisp and scrolling stays smooth.
+- Provide a solid-color fallback for high-contrast or reduced-transparency modes.
+- Keep the texture always on (no user toggle), but allow the `--texture-opacity` token to be tuned if we need to reduce weight globally.
 
-Dark mode mirrors these values with lighter text on deep slate backgrounds; avoid neon blues—stick to the same hue at higher lightness.
+## Component-Level Refresh
+- **Layout Shell:** Update `src/app/layout.tsx` and `src/app/globals.css` tokens to use the beige background and texture layer; keep generous whitespace from the design spec.
+- **Header + Sidebar:** Ensure borders remain hairline; use the soft navy for active states and underline indicators instead of filled blocks.
+- **Cards & Surfaces:** Prefer border-only sections with `border-stone-200` equivalents; reserve muted fills for highlights (e.g., refined output states).
+- **Inputs & Buttons:** Keep flat inputs. Shift primary buttons to the soft navy with subtle hover lightening; ghost buttons should inherit the ink text on beige.
+- **Typography:** Maintain serif for body and sans for accents; tighten letter spacing on uppercase labels to ~0.25–0.3em to match the analog tone.
 
-### Spacing & Shape
-- **Cards:** Flat (`shadow-none`), squared corners (`radius: 0.25rem`), 1px borders.
-- **Buttons:** Inline-flex pills with uppercase sans text. Default height `h-11`, `px-6`, `tracking-[0.3em]`.
-- **Sections:** Use generous `py-10+` to maintain breathing room; rely on `border-t` / `border-b` separators rather than backgrounds.
+## Token & Theme Changes
+- Update Tailwind CSS variables in `src/app/globals.css` to the new palette (background, foreground, primary, border, accent).
+- Add a `--texture-opacity` custom property to control the paper grain strength; expose a `.texture-none` utility for internal QA even though there is no user-facing toggle.
+- Adjust shadcn component tokens (buttons, cards, inputs) to reflect the soft navy primary and beige surfaces.
 
-## Patterns
-1. **Header & Navigation**
-   - Keep header height at 64px with border-bottom.
-   - Brand label uses uppercase Raleway (“English Refiner”) with subtle tracking.
-   - Section nav uses sans-serif uppercase text; no filled chips or heavy backgrounds.
+### Implementation snapshot (current)
+- Light palette now lives in CSS variables: background `hsl(35, 35%, 93%)`, card `hsl(35, 33%, 96%)`, ink `hsl(200, 14%, 15%)`, primary `hsl(205, 48%, 30%)` with hover at `hsl(205, 44%, 36%)`, and muted stone accents around `hsl(39, 27%, 90–92%)`.
+- Paper grain is applied globally via `body::before` using an inline fractal-noise SVG, scaled to 360px tiles with `--texture-opacity` defaulting to `0.05`; dark mode zeroes the opacity to preserve the slate scheme.
+- Cards, inputs, and headers now draw from `bg-card`/`bg-background` overlays rather than pure white, and buttons pick up the new primary plus softened ghost/outline treatments to keep the analog feel.
 
-2. **Sidebar**
-   - Toggle button: outlined circle, no filled state.
-   - Navigation items: 2px left border indicator; uppercase sans text.
-   - Background should remain semi-transparent white with blur on desktop, simple white sheet on mobile.
+## Asset & Performance Notes
+- Embed the paper texture as an inline SVG data URL to avoid extra requests; keep the pattern lightweight (~1–2 KB).
+- Verify contrast ratios meet WCAG AA on beige background (body text vs. background ≥ 4.5:1, primary buttons ≥ 3:1 for large text).
+- Keep dark mode on the current slate scheme for stronger contrast at night; do not introduce a beige paper variant there.
 
-3. **Cards & Content Blocks**
-   - Titles uppercase or light-weight serif. Example: “Original” label uses uppercase sans.
-   - Subcopy stays `text-secondary`. Callouts (Refined results) get `border-primary/30` to stand out.
+## Rollout Steps
+1. **Token Update:** Refresh CSS variables and Tailwind theme to new palette; add texture variables and utility class.
+2. **Global Shell:** Apply beige background and texture overlay in the root layout; confirm header/sidebar borders remain subtle.
+3. **Components:** Update shadcn UI components (button, card, input/textarea) to use new tokens, hover states, and letter spacing.
+4. **Pages:** Verify landing and home pages honor the new background and spacing; adjust any hard-coded colors to tokens.
+5. **QA:** Run accessibility pass for contrast; test texture performance on mid-tier devices and high-DPI displays.
 
-4. **Form Inputs**
-   - Inputs/Textareas: flat, white background, border `--border`. No drop shadows.
-   - Focus state: `ring-1` with primary hue.
-
-5. **CTAs**
-   - Buttons rely on uppercase Raleway text and subtle border/hover shifts.
-   - Secondary/ghost buttons should keep visible text color even when inactive; never default to `text-gray-400`.
-
-## Implementation References
-- **CSS Tokens:** `src/app/globals.css`
-- **Tailwind Font Settings:** `tailwind.config.ts`
-- **Surface Components:** `src/components/ui/{button,card,input,textarea}.tsx`
-- **Pages using Spec:** `src/app/page.tsx`, `src/app/home/*`, `src/features/sentence/components/InputForm.tsx`
-
-## Usage Checklist
-1. Leveraged serif body text with sans-serif accents?
-2. Sections separated with borders/spacing (not shaded cards)?
-3. Buttons/links stay uppercase with adequate tracking and no default blue underline?
-4. Inputs and cards use flat borders? (No drop shadows.)
-5. Links or metadata have at least 4.5:1 contrast relative to background?
-
-Document any deviations from this spec in PR descriptions so future contributors can track intentional shifts.***
+## Decisions (answered)
+- **Dark mode:** Keep the current slate scheme for stronger contrast at night (no beige paper variant).
+- **Texture toggle:** No user-facing toggle; rely on token-level adjustments if we need to lighten the texture globally.
