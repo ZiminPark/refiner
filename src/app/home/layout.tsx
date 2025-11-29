@@ -1,12 +1,22 @@
-'use client';
+import { ReactNode } from "react";
+import { redirect } from "next/navigation";
+import { AppHeader } from "@/components/app-header";
+import { createClient } from "@/lib/supabase/server";
 
-import { AppHeader } from '@/components/app-header';
+interface AppLayoutProps {
+  children: ReactNode;
+}
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function AppLayout({ children }: AppLayoutProps) {
+  const supabase = await createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    redirect("/login");
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
