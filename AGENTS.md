@@ -32,6 +32,8 @@ Each feature under `src/features/<featureName>` should include:
 
 **Example:** When adding a history feature, create `src/features/history/hooks/use-sentence-history.ts` and export reusable UI through `src/components/app-header.tsx` when needed across multiple routes.
 
+**Navigation requirement:** Every page must render `AppHeader` so the navigation stays visible, even on `/login` (wrap public routes in a layout that renders `AppHeader` with `showSessionControls={false}` when session controls should not appear).
+
 ### Prompt configuration guardrails
 The AI refinement prompt is editable from `src/app/home/settings/page.tsx` and persisted via the `usePromptSetting` hook in `src/hooks/usePromptSetting.ts`, which currently wraps `useLocalStorage`. When updating either location, keep the prompt default text in `src/lib/prompt.ts` (exported as `DEFAULT_REFINER_PROMPT`) as the single source of truth and preserve the TODO comment about migrating persistence from localStorage to the database.
 

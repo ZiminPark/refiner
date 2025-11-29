@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
 import { AlertCircle, Bell, CheckCircle2, Palette, Save, Sparkles, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import type { User as SupabaseUser } from '@supabase/auth-js';
 
 export default function SettingsPage() {
   const [promptSaved, setPromptSaved] = useState(false);
@@ -44,6 +46,54 @@ export default function SettingsPage() {
       if (settingsSaveTimeoutRef.current) {
         window.clearTimeout(settingsSaveTimeoutRef.current);
       }
+    };
+  }, []);
+
+  const lastUserIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const supabase = createClient();
+
+    const applyUser = (user: SupabaseUser) => {
+      setSettings((previous) => {
+        const nextName =
+          user.user_metadata?.full_name ??
+          user.user_metadata?.name ??
+          previous.name;
+        return {
+          ...previous,
+          email: user.email ?? previous.email,
+          name: nextName,
+        };
+      });
+    };
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (isMounted && user) {
+        lastUserIdRef.current = user.id;
+        applyUser(user);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) {
+        return;
+      }
+      const nextUser = session?.user ?? null;
+      if (nextUser) {
+        if (nextUser.id !== lastUserIdRef.current) {
+          lastUserIdRef.current = nextUser.id;
+        }
+        applyUser(nextUser);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
     };
   }, []);
 
