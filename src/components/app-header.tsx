@@ -1,10 +1,10 @@
 'use client';
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import { SignOutButton } from "@/components/sign-out-button";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const navLinks = [
   { href: "/home", label: "Refine" },
@@ -78,6 +78,16 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
                 <Link href="/login">Log in</Link>
               </Button>
             ))}
+          {!showSessionControls && !hasSession && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="font-sans text-[0.7rem] uppercase tracking-[0.23em] text-foreground/70 hover:text-foreground md:hidden"
+            >
+              <Link href="/login">Log in</Link>
+            </Button>
+          )}
         </div>
       </div>
     </header>
