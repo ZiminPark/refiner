@@ -2,10 +2,16 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
-import { Check, Copy, Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useSavePair } from '@/features/saves/hooks/useSavePair';
+import { ApiError } from '@/features/saves/api';
+import Link from 'next/link';
+import { BookmarkPlus, Check, Copy, Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
@@ -17,12 +23,17 @@ export function InputForm() {
   const [inputText, setInputText] = useState('');
   const [converted, setConverted] = useState<ConversionResult | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [saveState, setSaveState] = useState<'idle' | 'saved'>('idle');
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const saveResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
   const { prompt } = usePromptSetting();
   const { toast } = useToast();
+  const { refreshSession } = useSupabaseSession();
+  const { mutateAsync: persistPair, isPending: isSaving } = useSavePair();
 
   // Prefill the textarea with clipboard contents so users can convert immediately after landing.
   useEffect(() => {
@@ -87,6 +98,7 @@ export function InputForm() {
         refined: result.converted,
         explanation: result.explanation,
       });
+      setSaveState('idle');
     } catch (err) {
       console.error('Conversion error:', err);
     }
@@ -155,6 +167,14 @@ export function InputForm() {
     return () => window.removeEventListener('keydown', handleFocusShortcut);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (saveResetRef.current) {
+        clearTimeout(saveResetRef.current);
+      }
+    };
+  }, []);
+
   const copyRefinedToClipboard = useCallback(async () => {
     if (!converted?.refined || typeof navigator === 'undefined') {
       return false;
@@ -180,6 +200,61 @@ export function InputForm() {
 
   const handleCopy = () => {
     copyRefinedToClipboard();
+  };
+
+  const handleSave = async () => {
+    if (!converted || isSaving) {
+      return;
+    }
+
+    const session = await refreshSession();
+    if (!session) {
+      setIsSaveDialogOpen(true);
+      return;
+    }
+
+    try {
+      await persistPair({
+        originalText: converted.original,
+        refinedText: converted.refined,
+        explanation: converted.explanation,
+        sourcePrompt: prompt,
+        model: 'gpt-5',
+      });
+
+      setSaveState('saved');
+      if (saveResetRef.current) {
+        clearTimeout(saveResetRef.current);
+      }
+      saveResetRef.current = setTimeout(() => setSaveState('idle'), 5000);
+
+      toast({
+        title: 'Saved to your library',
+        description: 'You can revisit this refined pair anytime.',
+        action: (
+          <ToastAction altText="View history" asChild>
+            <Link href="/home/history" className="font-semibold">
+              View history
+            </Link>
+          </ToastAction>
+        ),
+        duration: 6000,
+      });
+    } catch (saveError) {
+      console.error('Save failed', saveError);
+      const isUnauthorized = saveError instanceof ApiError && saveError.status === 401;
+
+      if (isUnauthorized) {
+        setIsSaveDialogOpen(true);
+        return;
+      }
+
+      toast({
+        title: 'Could not save',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   useEffect(() => {
@@ -245,28 +320,54 @@ export function InputForm() {
         <div className="space-y-4">
           <Card className="border border-primary/25 bg-card">
             <CardHeader className="pb-3">
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-primary">
                   Refined Version
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopy}
-                  className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                      Copy
-                    </>
-                  )}
-                </Button>
+                <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <Button
+                    onClick={handleSave}
+                    disabled={!converted || isSaving}
+                    aria-pressed={saveState === 'saved'}
+                    aria-disabled={isSaving}
+                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
+                  >
+                    {isSaving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Saving
+                      </>
+                    ) : saveState === 'saved' ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Saved
+                      </>
+                    ) : (
+                      <>
+                        <BookmarkPlus className="w-4 h-4" />
+                        Save
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopy}
+                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        Copy
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -314,6 +415,47 @@ export function InputForm() {
           </Card>
         </div>
       )}
+
+      <Dialog open={isSaveDialogOpen} onOpenChange={setIsSaveDialogOpen}>
+        <DialogContent className="max-w-lg border-border bg-card">
+          <DialogHeader>
+            <DialogTitle className="font-sans text-base uppercase tracking-[0.3em] text-primary">
+              Sign in to save
+            </DialogTitle>
+            <DialogDescription className="text-foreground">
+              Create an account or log in to keep your refined inputs and outputs together. We&apos;ll hold your place so you can
+              pick up where you left off.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 text-xs font-semibold uppercase tracking-[0.28em] text-secondary underline underline-offset-4">
+            <Link href="/home" className="hover:text-foreground">
+              Refine
+            </Link>
+            <Link href="/home/history" className="hover:text-foreground">
+              History
+            </Link>
+            <Link href="/home/settings" className="hover:text-foreground">
+              Settings
+            </Link>
+          </div>
+          <DialogFooter className="gap-2 sm:justify-between">
+            <Button
+              variant="outline"
+              onClick={() => setIsSaveDialogOpen(false)}
+              className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em]"
+            >
+              Not now
+            </Button>
+            <Button
+              asChild
+              className="font-sans text-[0.7rem] uppercase tracking-[0.28em]"
+              onClick={() => setIsSaveDialogOpen(false)}
+            >
+              <Link href="/login">Log in</Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
 
     </div>

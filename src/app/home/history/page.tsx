@@ -2,142 +2,188 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { ArrowRight, Copy, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { useDeleteSavedPair } from '@/features/saves/hooks/useDeleteSavedPair';
+import { useSavedPairs } from '@/features/saves/hooks/useSavedPairs';
+import { ApiError } from '@/features/saves/api';
+import { ArrowRight, Copy, Loader2, LogIn, RefreshCw, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
-// Dummy data for UI mockup
-const dummyHistory = [
-  {
-    id: '1',
-    original: "I'm gonna finish this project tomorrow",
-    refined: "I'm going to finish this project tomorrow (refined)",
-    createdAt: '2025-10-07T10:30:00',
-  },
-  {
-    id: '2',
-    original: "He don't know how to solve this problem",
-    refined: "He doesn't know how to solve this problem (refined)",
-    createdAt: '2025-10-07T09:15:00',
-  },
-  {
-    id: '3',
-    original: "We was planning to meet at 3pm",
-    refined: "We were planning to meet at 3pm (refined)",
-    createdAt: '2025-10-06T16:45:00',
-  },
-  {
-    id: '4',
-    original: 'Can you helping me with this task?',
-    refined: 'Can you help me with this task? (refined)',
-    createdAt: '2025-10-06T14:20:00',
-  },
-  {
-    id: '5',
-    original: 'She have been working here since 2020',
-    refined: 'She has been working here since 2020 (refined)',
-    createdAt: '2025-10-05T11:00:00',
-  },
-];
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function HistoryPage() {
-  const [history, setHistory] = useState(dummyHistory);
+  const { data, isLoading, isError, error, refetch } = useSavedPairs();
+  const deleteSavedPair = useDeleteSavedPair();
+  const { toast } = useToast();
   const [copied, setCopied] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
-  };
+  const savedPairs = useMemo(() => data ?? [], [data]);
+  const apiError = error instanceof ApiError ? error : null;
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this item?')) {
-      setHistory(history.filter((item) => item.id !== id));
+  const handleCopy = async (text: string, id: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(id);
+      setTimeout(() => setCopied(null), 2000);
+      toast({ description: 'Copied. Paste to use it.' });
+    } catch (copyError) {
+      console.error('Clipboard copy failed', copyError);
+      toast({
+        title: 'Could not copy',
+        description: 'Try again or copy manually.',
+        variant: 'destructive',
+      });
     }
   };
 
-  const handleClearAll = () => {
-    if (confirm('Are you sure you want to clear all history?')) {
-      setHistory([]);
+  const handleDelete = async (id: string) => {
+    try {
+      setDeletingId(id);
+      await deleteSavedPair.mutateAsync(id);
+      toast({ title: 'Removed', description: 'Deleted from saved pairs.' });
+    } catch (deleteError) {
+      console.error('Delete failed', deleteError);
+      toast({
+        title: 'Could not delete',
+        description: 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeletingId(null);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-5xl px-6 py-10">
+        <div className="mb-8 space-y-3">
+          <div className="h-4 w-32 animate-pulse rounded bg-border" />
+          <div className="h-10 w-64 animate-pulse rounded bg-border" />
+          <div className="h-4 w-80 animate-pulse rounded bg-border" />
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((item) => (
+            <Card key={item} className="border border-border bg-card">
+              <CardHeader className="pb-2">
+                <div className="h-3 w-24 animate-pulse rounded bg-border" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-border" />
+                <div className="h-4 w-full animate-pulse rounded bg-border" />
+                <div className="h-4 w-11/12 animate-pulse rounded bg-border" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError && apiError?.status === 401) {
+    return (
+      <div className="mx-auto max-w-5xl px-6 py-10">
+        <Card className="border border-border bg-card/85">
+          <CardContent className="space-y-4 py-12 text-center">
+            <LogIn className="mx-auto h-8 w-8 text-secondary" />
+            <p className="text-lg font-semibold text-foreground">Sign in to view your saves</p>
+            <p className="text-sm leading-relaxed text-secondary">
+              Access your saved refinements across devices after logging in.
+            </p>
+            <Button asChild className="px-8 font-sans text-xs uppercase tracking-[0.28em]">
+              <Link href="/login">Log in</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="mx-auto max-w-5xl px-6 py-10">
+        <Card className="border border-border bg-card/85">
+          <CardContent className="flex flex-col items-start gap-4 py-10 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-lg font-semibold text-foreground">Couldn&apos;t load saved pairs</p>
+              <p className="text-sm leading-relaxed text-secondary">Please try again.</p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => refetch()}
+              className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.28em]"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Try again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="space-y-3">
-          <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">
-            Archive
-          </p>
-          <h1 className="text-[2.5rem] font-light leading-tight text-foreground">
-            Conversion history
-          </h1>
+          <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">Archive</p>
+          <h1 className="text-[2.5rem] font-light leading-tight text-foreground">Saved refinements</h1>
           <p className="text-base leading-relaxed text-secondary">
-            A clean log of what went in, what came out, and when it happened.
+            Your saved input/output pairs, ordered by most recent first.
           </p>
         </div>
-        {history.length > 0 && (
+        {savedPairs.length > 0 && (
           <Button
             variant="outline"
-            onClick={handleClearAll}
+            onClick={() => refetch()}
             className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
           >
-            <Trash2 className="w-4 h-4" />
-            Clear All
+            <RefreshCw className="w-4 h-4" />
+            Refresh
           </Button>
         )}
       </div>
 
-      {history.length === 0 ? (
+      {savedPairs.length === 0 ? (
         <Card className="border border-border bg-card/85">
           <CardContent className="space-y-3 py-16 text-center">
-            <p className="text-lg leading-relaxed text-foreground">
-              No conversion history yet
-            </p>
+            <p className="text-lg leading-relaxed text-foreground">No saved refinements yet</p>
             <p className="text-sm leading-relaxed text-secondary">
-              Start refining your sentences to build your archive.
+              Save your best refinements to revisit them later.
             </p>
             <Button asChild className="px-8 font-sans text-xs uppercase tracking-[0.28em]">
-              <a href="/home">
+              <Link href="/home">
                 Start refining
                 <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
+              </Link>
             </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {history.map((item) => (
-            <Card
-              key={item.id}
-              className="border border-border bg-card transition-colors hover:border-foreground"
-            >
+          {savedPairs.map((item) => (
+            <Card key={item.id} className="border border-border bg-card transition-colors hover:border-foreground">
               <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <CardTitle className="mb-2 text-sm font-normal leading-relaxed text-secondary">
-                      {formatDate(item.createdAt)}
-                    </CardTitle>
-                  </div>
+                <div className="flex justify-between items-start gap-3">
+                  <CardTitle className="text-sm font-normal leading-relaxed text-secondary">
+                    {formatDate(item.savedAt)}
+                  </CardTitle>
                   <div className="flex gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleCopy(item.refined, item.id)}
-                      className={cn(
-                        'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground',
-                      )}
+                      onClick={() => handleCopy(item.refinedText, item.id)}
+                      className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground"
                     >
                       <Copy className="w-4 h-4" />
                       {copied === item.id ? 'Copied!' : 'Copy'}
@@ -145,10 +191,15 @@ export default function HistoryPage() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      disabled={deletingId === item.id || deleteSavedPair.isPending}
                       onClick={() => handleDelete(item.id)}
                       className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-accent-error hover:border-accent-error/60"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {deletingId === item.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4" />
+                      )}
                       Delete
                     </Button>
                   </div>
@@ -156,64 +207,24 @@ export default function HistoryPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
-                    Original
-                  </p>
-                  <p className="text-base leading-relaxed text-foreground/80">{item.original}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">Original</p>
+                  <p className="text-base leading-relaxed text-foreground/80 whitespace-pre-wrap">{item.originalText}</p>
                 </div>
                 <div className="border-t border-border pt-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
-                    Refined
-                  </p>
-                  <p className="text-base font-medium leading-relaxed text-foreground">
-                    {item.refined}
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Refined</p>
+                  <p className="text-base font-medium leading-relaxed text-foreground whitespace-pre-wrap">
+                    {item.refinedText}
                   </p>
                 </div>
+                {item.explanation && (
+                  <div className="border-t border-border pt-2 text-secondary">
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em]">What changed</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{item.explanation}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
-        </div>
-      )}
-
-      {/* Pagination (UI only) */}
-      {history.length > 0 && (
-        <div className="mt-8 flex justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary"
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-primary bg-card text-primary hover:bg-[hsl(var(--primary-hover))] hover:text-primary-foreground"
-          >
-            1
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
-          >
-            2
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
-          >
-            3
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground"
-          >
-            Next
-          </Button>
         </div>
       )}
     </div>
