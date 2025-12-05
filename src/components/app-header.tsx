@@ -15,9 +15,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navLinks = [
-  { href: "/home", label: "Refine" },
-  { href: "/home/history", label: "History" },
-  { href: "/home/settings", label: "Settings" },
+  { href: "/", label: "Refine" },
+  { href: "/history", label: "History" },
+  { href: "/settings", label: "Settings" },
 ];
 
 interface AppHeaderProps {
@@ -61,7 +61,7 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
     <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         <Link
-          href="/home"
+          href="/"
           className="font-sans text-sm uppercase tracking-[0.28em] text-foreground/70 transition-colors hover:text-foreground"
         >
           English Refiner

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export function GoogleSignInButton() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +14,7 @@ export function GoogleSignInButton() {
     try {
       setIsLoading(true);
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback?next=/home`;
+      const redirectTo = `${window.location.origin}/auth/callback?next=/`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

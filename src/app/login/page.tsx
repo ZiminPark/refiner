@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { GoogleSignInButton } from "./google-sign-in-button";
 
 interface LoginPageProps {
@@ -21,7 +21,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         : undefined;
 
   if (session) {
-    redirect("/home");
+    redirect("/");
   }
 
   return (
