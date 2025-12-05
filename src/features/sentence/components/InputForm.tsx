@@ -195,7 +195,7 @@ export function InputForm() {
   };
 
   return (
-    <div className="space-y-8 text-foreground">
+    <div className="space-y-6 text-foreground">
       {/* Input Form */}
       <Card className="border border-border bg-card/90">
         <CardContent className="space-y-5 pt-6">
