@@ -4,7 +4,6 @@ import OpenAI from 'openai';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 
-const TEMPERATURE_DEFAULT = 0.7;
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -23,6 +22,13 @@ export async function POST(request: NextRequest,) {
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
         { error: 'Text is required and must be a string' },
+        { status: 400 }
+      );
+    }
+
+    if (temperature !== undefined && (typeof temperature !== 'number' || temperature < 0 || temperature > 2)) {
+      return NextResponse.json(
+        { error: 'Temperature must be a number between 0 and 2' },
         { status: 400 }
       );
     }
@@ -48,7 +54,6 @@ export async function POST(request: NextRequest,) {
           content: text,
         },
       ],
-      temperature: temperature ?? TEMPERATURE_DEFAULT,
       response_format: zodResponseFormat(RefinementResponse, 'refinement_response'),
     });
 
