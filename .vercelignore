@@ -1,0 +1,42 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.*
+
+# Testing
+coverage
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__
+
+# Development files
+.env.local
+.env.development
+.env.test
+
+# Documentation
+docs
+*.md
+!README.md
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Misc
+.DS_Store
+*.pem
+*.log
+.vooster
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Cursor
+.cursor
