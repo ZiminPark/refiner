@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
-import { Check, Copy, Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Check, Copy, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
@@ -16,6 +16,7 @@ const shortcutKeyClassName =
 export function InputForm() {
   const [inputText, setInputText] = useState('');
   const [converted, setConverted] = useState<ConversionResult | null>(null);
+  const [refinedText, setRefinedText] = useState('');
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
@@ -82,11 +83,13 @@ export function InputForm() {
         text: inputText,
         prompt,
       });
+      const refined = result.converted;
       setConverted({
         original: inputText,
-        refined: result.converted,
+        refined,
         explanation: result.explanation,
       });
+      setRefinedText(refined);
     } catch (err) {
       console.error('Conversion error:', err);
     }
@@ -156,12 +159,12 @@ export function InputForm() {
   }, []);
 
   const copyRefinedToClipboard = useCallback(async () => {
-    if (!converted?.refined || typeof navigator === 'undefined') {
+    if (!refinedText || typeof navigator === 'undefined') {
       return false;
     }
 
     try {
-      await navigator.clipboard.writeText(converted.refined);
+      await navigator.clipboard.writeText(refinedText);
       setCopied(true);
       toast({
         description: 'Copied. Paste to use it.',
@@ -176,7 +179,7 @@ export function InputForm() {
     } finally {
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [converted?.refined, toast]);
+  }, [refinedText, toast]);
 
   const handleCopy = () => {
     copyRefinedToClipboard();
@@ -263,16 +266,18 @@ export function InputForm() {
                   ) : (
                     <>
                       <Copy className="w-4 h-4" />
-                      Copy
                     </>
                   )}
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <p className="mb-4 text-base font-medium leading-relaxed text-foreground whitespace-pre-wrap">
-                {converted.refined}
-              </p>
+              <Textarea
+                value={refinedText}
+                onChange={(e) => setRefinedText(e.target.value)}
+                className="mb-4 min-h-[120px] text-base font-medium leading-relaxed text-foreground resize-none"
+                placeholder="Refined sentence will appear here..."
+              />
               
               {/* Explanation Section */}
               {converted.explanation && (
@@ -286,30 +291,7 @@ export function InputForm() {
                 </div>
               )}
               
-              {/* Feedback Section */}
-              <div className="pt-4 border-t border-accent-success/20 mt-4">
-                <p className="mb-3 text-sm leading-relaxed text-secondary">Was this helpful?</p>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleFeedback(true)}
-                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] hover:text-foreground"
-                  >
-                    <ThumbsUp className="w-4 h-4" />
-                    Yes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleFeedback(false)}
-                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em] hover:text-foreground"
-                  >
-                    <ThumbsDown className="w-4 h-4" />
-                    No
-                  </Button>
-                </div>
-              </div>
+             
             </CardContent>
           </Card>
         </div>
