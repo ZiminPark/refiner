@@ -4,6 +4,8 @@ import OpenAI from 'openai';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
 
+const TEMPERATURE_DEFAULT = 0.7;
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -14,9 +16,9 @@ const RefinementResponse = z.object({
   explanation: z.string().describe('Brief explanation of the key changes made and why they improve the sentence'),
 });
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest,) {
   try {
-    const { text, prompt } = await request.json();
+    const { text, prompt, temperature } = await request.json();
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
     const systemPrompt = typeof prompt === 'string' && prompt.trim().length > 0 ? prompt : DEFAULT_REFINER_PROMPT;
 
     const completion = await client.chat.completions.parse({
-      model: 'gpt-5',
+      model: "gpt-5.1-chat-latest",
       messages: [
         {
           role: 'system',
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest) {
           content: text,
         },
       ],
-      reasoning_effort: 'minimal',
+      temperature: temperature ?? TEMPERATURE_DEFAULT,
       response_format: zodResponseFormat(RefinementResponse, 'refinement_response'),
     });
 

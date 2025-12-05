@@ -12,4 +12,5 @@ export interface ConversionResult {
 export interface ConvertSentenceInput {
   text: string;
   prompt?: string;
+  temperature?: number;
 }
