@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
+    DialogHeader,
+    DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { useState } from 'react';
@@ -24,6 +26,9 @@ export function FeatureRequestSection() {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Shape the refinement lab</DialogTitle>
+        </DialogHeader>
         <FeatureRequestPanel inModal onSuccess={() => setIsOpen(false)} />
       </DialogContent>
     </Dialog>

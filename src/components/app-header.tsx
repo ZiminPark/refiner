@@ -2,6 +2,14 @@
 
 import { SignOutButton } from "@/components/sign-out-button";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FeatureRequestPanel } from "@/features/feature-request/components/FeatureRequestPanel";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -18,6 +26,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
   const [hasSession, setHasSession] = useState(false);
+  const [isFeatureRequestOpen, setIsFeatureRequestOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -64,6 +73,19 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
                 {link.label}
               </Link>
             ))}
+            <Dialog open={isFeatureRequestOpen} onOpenChange={setIsFeatureRequestOpen}>
+              <DialogTrigger asChild>
+                <button className="font-sans text-xs uppercase tracking-[0.23em] text-foreground/70 transition-colors hover:text-foreground">
+                  Requests
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>Shape the refinement lab</DialogTitle>
+                </DialogHeader>
+                <FeatureRequestPanel inModal onSuccess={() => setIsFeatureRequestOpen(false)} />
+              </DialogContent>
+            </Dialog>
           </nav>
           {showSessionControls &&
             (hasSession ? (

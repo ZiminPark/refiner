@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
@@ -78,7 +78,7 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
 
       toast({
         title: 'Sent to the roadmap channel',
-        description: 'We bookmarked your idea in Slack. Thank you for steering us.',
+        description: 'We bookmarked your idea. Thank you for steering us.',
         className:
           'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-none font-semibold tracking-tight sm:max-w-[360px]',
       });
@@ -98,19 +98,15 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
     <Card className={inModal ? "border-0 bg-transparent shadow-none" : "border border-border/80 bg-card/90 shadow-sm backdrop-blur-sm"}>
       <CardHeader className="pb-4 space-y-3">
         <div className="inline-flex items-center gap-2 text-[0.7rem] uppercase tracking-[0.3em] text-secondary">
-          <Sparkles className="h-4 w-4" strokeWidth={1.5} />
           <span>Feature Requests</span>
         </div>
         <CardTitle className="text-2xl font-light leading-snug text-foreground">
           Shape the refinement lab
         </CardTitle>
         <p className="text-sm leading-relaxed text-secondary">
-          Drop an idea, friction point, or integration wish. We route it straight into Slack so the
-          team can pick it up without losing the analog calm of this workspace.
+          Drop an idea, friction point, or integration wish.
         </p>
         <div className="flex flex-wrap gap-2 text-[0.7rem] uppercase tracking-[0.3em] text-muted-foreground">
-          <span className="rounded-full border border-border px-3 py-1">Avg response &lt; 1 day</span>
-          <span className="rounded-full border border-border px-3 py-1">Be specific, stay brief</span>
         </div>
       </CardHeader>
       <CardContent>
@@ -123,7 +119,6 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
               <Input
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
-                placeholder="Concise headline (e.g., 'Faster paste-to-refine flow')"
                 disabled={isSubmitting}
                 className="bg-background/60"
               />
@@ -158,13 +153,9 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
             <Textarea
               value={details}
               onChange={(event) => setDetails(event.target.value)}
-              placeholder="What would make this better for you? Add context, a quick scenario, or a link."
               disabled={isSubmitting}
               className="min-h-[140px] bg-background/60"
             />
-            <p className="text-xs text-muted-foreground">
-              The more concrete the scenario, the faster we can ship it.
-            </p>
           </div>
 
           <div className="space-y-2">
@@ -191,9 +182,6 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-xs text-muted-foreground">
-              We’ll log this in Slack with your timestamp and follow up if we need details.
-            </div>
             <Button
               type="submit"
               disabled={isSubmitting}
@@ -207,7 +195,7 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
               ) : (
                 <>
                   <Send className="h-4 w-4" />
-                  Send to Slack
+                  Send
                 </>
               )}
             </Button>

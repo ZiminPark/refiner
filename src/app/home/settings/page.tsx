@@ -10,10 +10,10 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
-import { AlertCircle, Bell, CheckCircle2, Palette, Save, Sparkles, User } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import type { User as SupabaseUser } from '@supabase/auth-js';
+import { Bell, CheckCircle2, Palette, Save, User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SettingsPage() {
   const [promptSaved, setPromptSaved] = useState(false);
@@ -145,7 +145,6 @@ export default function SettingsPage() {
         <Card className="border border-border bg-card/85">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-primary" />
               <div>
                 <CardTitle className="text-2xl font-semibold leading-relaxed">AI Prompt</CardTitle>
                 <CardDescription className="text-sm leading-relaxed">
