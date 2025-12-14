@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import { RefinedChangeHighlights } from './RefinedChangeHighlights';
 import { RefinedOutputTabs } from './RefinedOutputTabs';
-import { ChangeDetailsDialog } from './ChangeDetailsDialog';
+import { ChangeDetailsPanel } from './ChangeDetailsPanel';
 import { computeChangeHighlights } from '../lib/diff';
 import type { ChangeHighlightsResult, ConversionResult } from '../types';
 
@@ -26,7 +26,7 @@ export function InputForm() {
   const [changeHighlights, setChangeHighlights] = useState<ChangeHighlightsResult | null>(null);
   const [viewMode, setViewMode] = useState<'changes' | 'refined'>('refined');
   const [activeChangeId, setActiveChangeId] = useState<string | null>(null);
-  const [isChangeDialogOpen, setIsChangeDialogOpen] = useState(false);
+  const [isChangePanelOpen, setIsChangePanelOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
@@ -139,7 +139,7 @@ export function InputForm() {
       setChangeHighlights(highlights);
       setViewMode(highlights.changes.length > 0 ? 'changes' : 'refined');
       setActiveChangeId(highlights.changes[0]?.id ?? null);
-      setIsChangeDialogOpen(false);
+      setIsChangePanelOpen(false);
       setSavedHistoryId(null);
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -163,7 +163,7 @@ export function InputForm() {
     setRefinedText('');
     setChangeHighlights(null);
     setActiveChangeId(null);
-    setIsChangeDialogOpen(false);
+    setIsChangePanelOpen(false);
     setViewMode('refined');
     setSavedHistoryId(null);
     setSaveAction(null);
@@ -185,7 +185,7 @@ export function InputForm() {
     if (!converted) {
       setChangeHighlights(null);
       setActiveChangeId(null);
-      setIsChangeDialogOpen(false);
+      setIsChangePanelOpen(false);
       return;
     }
 
@@ -194,7 +194,7 @@ export function InputForm() {
 
     if (viewMode === 'changes' && updatedHighlights.changes.length === 0) {
       setViewMode('refined');
-      setIsChangeDialogOpen(false);
+      setIsChangePanelOpen(false);
     }
 
     if (
@@ -325,32 +325,32 @@ export function InputForm() {
     }
     setViewMode(mode);
     if (mode === 'refined') {
-      setIsChangeDialogOpen(false);
+      setIsChangePanelOpen(false);
     }
   };
 
-  const openChangeDialogFor = (changeId: string | null) => {
+  const openChangePanelFor = (changeId: string | null) => {
     if (!changeId) {
       return;
     }
     setActiveChangeId(changeId);
     setViewMode('changes');
-    setIsChangeDialogOpen(true);
+    setIsChangePanelOpen(true);
   };
 
   const handleChangeCountClick = () => {
     if (!changeHighlights?.changes.length) {
       return;
     }
-    openChangeDialogFor(changeHighlights.changes[0]?.id ?? null);
+    openChangePanelFor(changeHighlights.changes[0]?.id ?? null);
   };
 
   const handleHighlightSelect = (changeId: string) => {
-    openChangeDialogFor(changeId);
+    openChangePanelFor(changeId);
   };
 
-  const handleDialogOpenChange = (open: boolean) => {
-    setIsChangeDialogOpen(open);
+  const handlePanelOpenChange = (open: boolean) => {
+    setIsChangePanelOpen(open);
   };
 
   const handleActiveChangeIdChange = (changeId: string) => {
@@ -600,11 +600,11 @@ export function InputForm() {
               )}
             </CardContent>
           </Card>
-          <ChangeDetailsDialog
-            open={isChangeDialogOpen}
+          <ChangeDetailsPanel
+            open={isChangePanelOpen}
             changes={changeHighlights?.changes ?? []}
             activeChangeId={activeChangeId}
-            onOpenChange={handleDialogOpenChange}
+            onOpenChange={handlePanelOpenChange}
             onActiveChangeId={handleActiveChangeIdChange}
           />
         </div>
