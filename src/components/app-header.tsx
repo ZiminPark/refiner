@@ -1,6 +1,5 @@
 'use client';
 
-import { SignOutButton } from "@/components/sign-out-button";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -87,19 +86,16 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
               </DialogContent>
             </Dialog>
           </nav>
-          {showSessionControls &&
-            (hasSession ? (
-              <SignOutButton />
-            ) : (
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="font-sans text-[0.7rem] uppercase tracking-[0.23em] text-foreground/70 hover:text-foreground"
-              >
-                <Link href="/login">Log in</Link>
-              </Button>
-            ))}
+          {showSessionControls && !hasSession && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="font-sans text-[0.7rem] uppercase tracking-[0.23em] text-foreground/70 hover:text-foreground"
+            >
+              <Link href="/login">Log in</Link>
+            </Button>
+          )}
           {!showSessionControls && !hasSession && (
             <Button
               asChild

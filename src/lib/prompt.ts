@@ -10,6 +10,10 @@ export const DEFAULT_REFINER_PROMPT = `You are an expert English writing assista
 
 Respond with both the refined sentence and a clear explanation of improvements.
 
+# Notes
+- Do not add “Please” unless it appears in the original sentence.
+- Preserve imperative sentences when appropriate.
+
 # Formatting
 If the input includes Markdown formatting, keep it. 
 For example, 

@@ -1,5 +1,6 @@
 # Repository Guidelines
 
+
 ## Project Structure & Module Organization
 Follow the feature-first layout from `docs/architecture.md`: `src/app` hosts the Next.js App Router, shared primitives live in `src/components/ui`, and each feature keeps its `components`, `hooks`, `lib`, `schema.ts`, and `api.ts` under `src/features/<featureName>`. Keep cross-cutting hooks in `src/hooks`, utilities in `src/lib/utils.ts`, and migrations in `supabase/migrations/0000_name.sql`.
 
@@ -37,6 +38,12 @@ Each feature under `src/features/<featureName>` should include:
 ### Prompt configuration guardrails
 The AI refinement prompt is editable from `src/app/home/settings/page.tsx` and persisted via the `usePromptSetting` hook in `src/hooks/usePromptSetting.ts`, which currently wraps `useLocalStorage`. When updating either location, keep the prompt default text in `src/lib/prompt.ts` (exported as `DEFAULT_REFINER_PROMPT`) as the single source of truth and preserve the TODO comment about migrating persistence from localStorage to the database.
 
+
+### History/Favorites
+- Refine API does not auto-save; saving is manual via the InputForm star button, using optimistic insert/delete in `refinement_history`.
+- History page is “saved-only”: copy output, copy pair, remove without confirm, clear-all per user, saved count chips.
+- Signed-out history shows an explainer + demo preview; `AuthSessionMissingError` is handled quietly.
+- Schema: `refinement_history` with RLS (select/insert/delete by user). See `docs/refinement_history.sql`.
 
 ## Coding Style & Naming Conventions
 Per `docs/guideline.md` and `docs/clean-code.md`, default to client components (`use client`) and promise-based `page.tsx` params. Prefer TypeScript, Tailwind utilities, and shadcn/ui primitives; bring in date-fns, @tanstack/react-query, zod, react-hook-form, lucide-react, and zustand as described. Use intention-revealing PascalCase for components (`FeatureActionButton`), camelCase for hooks (`useSentenceHistory`), and UPPER_SNAKE_CASE for constants. Keep functions small, favor early returns, avoid mutation, and document “why” when behavior is non-obvious.

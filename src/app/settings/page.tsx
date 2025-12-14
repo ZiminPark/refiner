@@ -1,6 +1,7 @@
 'use client';
 
 import { AppHeader } from '@/components/app-header';
+import { SignOutButton } from '@/components/sign-out-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -199,7 +200,20 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-
+          <Card className="border border-border bg-card/85">
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="text-2xl font-semibold leading-relaxed">Account</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  Sign out of Refiner on this device.
+                </CardDescription>
+              </div>
+              <SignOutButton />
+            </CardHeader>
+            <CardContent className="text-sm leading-relaxed text-secondary">
+              Signing out will end your current session and return you to the login screen.
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

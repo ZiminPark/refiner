@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
-import { Check, Copy, Loader2 } from 'lucide-react';
+import { Check, Copy, Loader2, Star } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { cn } from '@/lib/utils';
 import { useConvertSentence } from '../hooks/useConvertSentence';
 import type { ConversionResult } from '../types';
 
@@ -21,6 +23,10 @@ export function InputForm() {
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const supabase = useRef(createClient());
+  const [userId, setUserId] = useState<string | null>(null);
+  const [saveAction, setSaveAction] = useState<'saving' | 'removing' | null>(null);
+  const [savedHistoryId, setSavedHistoryId] = useState<string | null>(null);
   const { convertSentence, isLoading, error } = useConvertSentence();
   const { prompt } = usePromptSetting();
   const { toast } = useToast();
@@ -75,6 +81,36 @@ export function InputForm() {
     setIsMacUser(/mac|darwin|iphone|ipad/i.test(platform));
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    const client = supabase.current;
+
+    client.auth.getUser().then(({ data, error }) => {
+      if (!isMounted) return;
+      if (error) {
+        if (error.name !== 'AuthSessionMissingError') {
+          console.warn('[refine] auth getUser error', error);
+        }
+        setUserId(null);
+        return;
+      }
+      setUserId(data.user?.id ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = client.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+      setUserId(session?.user?.id ?? null);
+      setSavedHistoryId(null);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const handleConvert = useCallback(async () => {
     if (!inputText.trim() || isLoading) return;
 
@@ -90,6 +126,7 @@ export function InputForm() {
         explanation: result.explanation,
       });
       setRefinedText(refined);
+      setSavedHistoryId(null);
     } catch (err) {
       console.error('Conversion error:', err);
     }
@@ -185,6 +222,90 @@ export function InputForm() {
     copyRefinedToClipboard();
   };
 
+  const handleSave = async () => {
+    if (!converted || !converted.original.trim()) {
+      return;
+    }
+
+    const client = supabase.current;
+
+    if (!userId) {
+      toast({
+        description: 'Log in to save this pair for later.',
+      });
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 300);
+      return;
+    }
+
+    try {
+      if (saveAction) {
+        return;
+      }
+
+      if (savedHistoryId) {
+        setSaveAction('removing');
+        const previousId = savedHistoryId;
+        setSavedHistoryId(null);
+
+        const { error } = await client
+          .from('refinement_history')
+          .delete()
+          .eq('id', previousId);
+
+        if (error) {
+          throw error;
+        }
+
+        toast({ description: 'Removed from saved.' });
+        return;
+      }
+
+      setSaveAction('saving');
+      setSavedHistoryId('pending');
+
+      const { data, error } = await client
+        .from('refinement_history')
+        .insert({
+          user_id: userId,
+          input_text: converted.original,
+          output_text: converted.refined,
+          explanation: converted.explanation || null,
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.id) {
+        setSavedHistoryId(data.id);
+        toast({
+          description: 'Saved to your board. View it in History.',
+        });
+      }
+    } catch (saveError) {
+      console.error('[refine] save failed', saveError);
+      setSavedHistoryId((current) => {
+        if (saveAction === 'removing') {
+          return current ?? null;
+        }
+        if (saveAction === 'saving' && current === 'pending') {
+          return null;
+        }
+        return current;
+      });
+      toast({
+        description: 'Unable to save right now. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaveAction(null);
+    }
+  };
+
   useEffect(() => {
     if (!converted) {
       return;
@@ -252,23 +373,52 @@ export function InputForm() {
                 <CardTitle className="text-lg font-semibold uppercase tracking-[0.2em] text-primary">
                   Refined Version
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopy}
-                  className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant={savedHistoryId ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={handleSave}
+                    disabled={Boolean(saveAction)}
+                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
+                  >
+                    {saveAction === 'saving' ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : saveAction === 'removing' ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Star
+                        className={cn(
+                          'w-4 h-4',
+                          savedHistoryId ? 'fill-current' : 'text-foreground/70'
+                        )}
+                      />
+                    )}
+                    {saveAction === 'saving'
+                      ? 'Saving…'
+                      : saveAction === 'removing'
+                        ? 'Removing…'
+                        : savedHistoryId
+                          ? 'Saved'
+                          : 'Save'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopy}
+                    className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.3em]"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>

@@ -86,6 +86,7 @@ export async function POST(request: NextRequest,) {
         rawMessage: message,
         usage: completion.usage,
       });
+
       return NextResponse.json({
         converted: converted.trim(),
         usage: {
