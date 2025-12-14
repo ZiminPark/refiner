@@ -532,9 +532,14 @@ export function InputForm() {
             <div className="hidden w-full sm:flex sm:w-auto">
               <Button
                 type="button"
+                variant={isLoading ? 'outline' : 'default'}
                 onClick={isLoading ? handleCancel : handleConvert}
                 disabled={!isLoading && !canConvert}
-                className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
+                className={cn(
+                  'w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]',
+                  isLoading &&
+                    'border-border bg-background/70 shadow-none text-muted-foreground hover:bg-background/80'
+                )}
                 aria-keyshortcuts={!isLoading ? ariaShortcut : undefined}
               >
                 {isLoading ? (
@@ -577,11 +582,16 @@ export function InputForm() {
 
               <Button
                 type="button"
+                variant={isLoading ? 'ghost' : 'default'}
                 onClick={isLoading ? handleCancel : handleConvert}
                 disabled={!isLoading && !canConvert}
                 aria-label={isLoading ? 'Cancel conversion' : 'Refine sentence'}
                 aria-keyshortcuts={!isLoading ? ariaShortcut : undefined}
-                className="flex-1 justify-center px-6"
+                className={cn(
+                  'flex-1 justify-center px-6',
+                  isLoading &&
+                    'border-border bg-background/40 text-muted-foreground hover:bg-background/50'
+                )}
               >
                 {isLoading ? (
                   <>
