@@ -327,7 +327,7 @@ export default function HistoryPage() {
 
   return (
     <AppShell>
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl mx-auto">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-3">
             <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">

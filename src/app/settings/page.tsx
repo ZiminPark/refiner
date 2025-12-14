@@ -129,7 +129,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-4xl mx-auto">
         <div className="mb-8 space-y-3">
           <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">Workbench</p>
           <h1 className="text-[2.5rem] font-light leading-tight text-foreground">Settings</h1>
