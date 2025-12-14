@@ -10,7 +10,7 @@ export default function HomePage() {
       <AppHeader />
       <div className="mx-auto max-w-5xl px-6 py-10 space-y-10">
         <div className="space-y-3">
-          <h1 className="text-[2.5rem] font-light leading-tight text-foreground">
+          <h1 className="text-3xl sm:text-[2.5rem] font-light leading-tight text-foreground">
             <TypingAnimation text="Refine your English" />
           </h1>
         </div>

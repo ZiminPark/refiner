@@ -8,8 +8,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FeatureRequestPanel } from "@/features/feature-request/components/FeatureRequestPanel";
-import { createClient } from "@/lib/supabase/client";
 import {
   Sheet,
   SheetClose,
@@ -18,6 +16,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { FeatureRequestPanel } from "@/features/feature-request/components/FeatureRequestPanel";
+import { createClient } from "@/lib/supabase/client";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -83,7 +83,7 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
           href="/"
           className="font-sans text-sm uppercase tracking-[0.28em] text-foreground/70 transition-colors hover:text-foreground"
         >
-          English Refiner
+          Refiner
         </Link>
         <div className="flex items-center gap-4">
           <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
