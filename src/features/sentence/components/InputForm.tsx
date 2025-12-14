@@ -10,7 +10,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { useConvertSentence } from '../hooks/useConvertSentence';
-import type { ConversionResult } from '../types';
+import { RefinedChangeHighlights } from './RefinedChangeHighlights';
+import { RefinedOutputTabs } from './RefinedOutputTabs';
+import { ChangeDetailsDialog } from './ChangeDetailsDialog';
+import { computeChangeHighlights } from '../lib/diff';
+import type { ChangeHighlightsResult, ConversionResult } from '../types';
 
 const shortcutKeyClassName =
   'inline-flex items-center rounded-[3px] border border-border bg-background/70 px-2 py-0.5 font-mono text-[0.65rem] font-semibold tracking-[0.15em] text-muted-foreground';
@@ -19,6 +23,10 @@ export function InputForm() {
   const [inputText, setInputText] = useState('');
   const [converted, setConverted] = useState<ConversionResult | null>(null);
   const [refinedText, setRefinedText] = useState('');
+  const [changeHighlights, setChangeHighlights] = useState<ChangeHighlightsResult | null>(null);
+  const [viewMode, setViewMode] = useState<'changes' | 'refined'>('refined');
+  const [activeChangeId, setActiveChangeId] = useState<string | null>(null);
+  const [isChangeDialogOpen, setIsChangeDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
@@ -120,12 +128,18 @@ export function InputForm() {
         prompt,
       });
       const refined = result.converted;
+      const highlights = computeChangeHighlights(inputText, refined);
+
       setConverted({
         original: inputText,
         refined,
         explanation: result.explanation,
       });
       setRefinedText(refined);
+      setChangeHighlights(highlights);
+      setViewMode(highlights.changes.length > 0 ? 'changes' : 'refined');
+      setActiveChangeId(highlights.changes[0]?.id ?? null);
+      setIsChangeDialogOpen(false);
       setSavedHistoryId(null);
     } catch (err) {
       console.error('Conversion error:', err);
@@ -136,6 +150,10 @@ export function InputForm() {
     setInputText('');
     setConverted(null);
     setRefinedText('');
+    setChangeHighlights(null);
+    setActiveChangeId(null);
+    setIsChangeDialogOpen(false);
+    setViewMode('refined');
     setSavedHistoryId(null);
     setSaveAction(null);
     setCopied(false);
@@ -150,6 +168,31 @@ export function InputForm() {
     isMacUser === null ? '⌘ + ↵' : isMacUser ? '⌘ + ↵' : '⌃ + ↵';
   const ariaShortcut =
     isMacUser === null ? 'Meta+Enter Control+Enter' : isMacUser ? 'Meta+Enter' : 'Control+Enter';
+
+  useEffect(() => {
+    if (!converted) {
+      setChangeHighlights(null);
+      setActiveChangeId(null);
+      setIsChangeDialogOpen(false);
+      return;
+    }
+
+    const updatedHighlights = computeChangeHighlights(converted.original, refinedText);
+    setChangeHighlights(updatedHighlights);
+
+    if (viewMode === 'changes' && updatedHighlights.changes.length === 0) {
+      setViewMode('refined');
+      setIsChangeDialogOpen(false);
+    }
+
+    if (
+      viewMode === 'changes' &&
+      activeChangeId &&
+      !updatedHighlights.changes.some((change) => change.id === activeChangeId)
+    ) {
+      setActiveChangeId(updatedHighlights.changes[0]?.id ?? null);
+    }
+  }, [converted, refinedText, viewMode, activeChangeId]);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -261,6 +304,47 @@ export function InputForm() {
     copyRefinedToClipboard();
   };
 
+  const handleViewModeChange = (mode: 'changes' | 'refined') => {
+    if (mode === 'changes' && !(changeHighlights?.changes.length)) {
+      return;
+    }
+    if (mode === 'changes' && changeHighlights?.changes.length && !activeChangeId) {
+      setActiveChangeId(changeHighlights.changes[0].id);
+    }
+    setViewMode(mode);
+    if (mode === 'refined') {
+      setIsChangeDialogOpen(false);
+    }
+  };
+
+  const openChangeDialogFor = (changeId: string | null) => {
+    if (!changeId) {
+      return;
+    }
+    setActiveChangeId(changeId);
+    setViewMode('changes');
+    setIsChangeDialogOpen(true);
+  };
+
+  const handleChangeCountClick = () => {
+    if (!changeHighlights?.changes.length) {
+      return;
+    }
+    openChangeDialogFor(changeHighlights.changes[0]?.id ?? null);
+  };
+
+  const handleHighlightSelect = (changeId: string) => {
+    openChangeDialogFor(changeId);
+  };
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsChangeDialogOpen(open);
+  };
+
+  const handleActiveChangeIdChange = (changeId: string) => {
+    setActiveChangeId(changeId);
+  };
+
   const handleSave = async () => {
     if (!converted || !converted.original.trim()) {
       return;
@@ -356,6 +440,9 @@ export function InputForm() {
   const handleFeedback = (isPositive: boolean) => {
     alert(`Feedback ${isPositive ? 'positive' : 'negative'} recorded (UI only)`);
   };
+
+  const changeCount = changeHighlights?.changes.length ?? 0;
+  const showChangesTab = changeCount > 0;
 
   return (
     <div className="space-y-6 text-foreground">
@@ -463,17 +550,34 @@ export function InputForm() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <Textarea
-                value={refinedText}
-                onChange={(e) => setRefinedText(e.target.value)}
-                className="mb-4 min-h-[120px] text-base font-medium leading-relaxed text-foreground resize-none"
-                placeholder="Refined sentence will appear here..."
+            <CardContent className="space-y-4">
+              <RefinedOutputTabs
+                viewMode={viewMode}
+                onViewModeChange={handleViewModeChange}
+                changeCount={changeCount}
+                showChangesTab={showChangesTab}
+                onChangeCountClick={handleChangeCountClick}
               />
+
+              {viewMode === 'changes' && changeHighlights ? (
+                <RefinedChangeHighlights
+                  segments={changeHighlights.segments}
+                  changes={changeHighlights.changes}
+                  activeChangeId={activeChangeId}
+                  onHighlightSelect={handleHighlightSelect}
+                />
+              ) : (
+                <Textarea
+                  value={refinedText}
+                  onChange={(e) => setRefinedText(e.target.value)}
+                  className="min-h-[120px] resize-none text-base font-medium leading-relaxed text-foreground"
+                  placeholder="Refined sentence will appear here..."
+                />
+              )}
               
               {/* Explanation Section */}
               {converted.explanation && (
-                <div className="mt-4 pt-4 border-t border-accent-success/20">
+                <div className="pt-4 border-t border-accent-success/20">
                   <h4 className="mb-2 text-sm font-semibold text-secondary">
                     What Changed?
                   </h4>
@@ -482,10 +586,15 @@ export function InputForm() {
                   </p>
                 </div>
               )}
-              
-             
             </CardContent>
           </Card>
+          <ChangeDetailsDialog
+            open={isChangeDialogOpen}
+            changes={changeHighlights?.changes ?? []}
+            activeChangeId={activeChangeId}
+            onOpenChange={handleDialogOpenChange}
+            onActiveChangeId={handleActiveChangeIdChange}
+          />
         </div>
       )}
 
