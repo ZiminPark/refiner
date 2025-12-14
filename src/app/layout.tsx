@@ -31,6 +31,12 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
+        url: '/icon.png',
+        width: 1024,
+        height: 1024,
+        alt: 'American English Refiner',
+      },
+      {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
@@ -39,11 +45,11 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: 'American English Refiner - Improve Your English Writing',
     description:
       'An AI-powered tool that converts your sentences into natural, grammatically correct American English.',
-    images: ['/twitter-image'],
+    images: ['/icon.png'],
   },
 };
 
