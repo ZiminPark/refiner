@@ -35,6 +35,7 @@ interface AppHeaderProps {
 export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
   const [hasSession, setHasSession] = useState(false);
   const [isFeatureRequestOpen, setIsFeatureRequestOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const mobileNavLinks = hasSession
     ? [
@@ -85,7 +86,7 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
           English Refiner
         </Link>
         <div className="flex items-center gap-4">
-          <Sheet>
+          <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
@@ -114,6 +115,17 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
                     </Button>
                   </SheetClose>
                 ))}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="h-11 w-full justify-start font-sans text-xs uppercase tracking-[0.23em] text-foreground/80"
+                  onClick={() => {
+                    setIsMobileNavOpen(false);
+                    setIsFeatureRequestOpen(true);
+                  }}
+                >
+                  Requests
+                </Button>
               </nav>
             </SheetContent>
           </Sheet>
