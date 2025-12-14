@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
+import { ChangeDetailsPanel } from '@/features/sentence/components/ChangeDetailsPanel';
+import { RefinedChangeHighlights } from '@/features/sentence/components/RefinedChangeHighlights';
+import { RefinedOutputTabs } from '@/features/sentence/components/RefinedOutputTabs';
+import { computeChangeHighlights } from '@/features/sentence/lib/diff';
 import { ArrowRight, Copy, Loader2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -199,6 +203,7 @@ export default function HistoryPage() {
     });
   };
 
+
   const renderBody = () => {
     if (isLoading) {
       return (
@@ -265,34 +270,14 @@ export default function HistoryPage() {
                 Demo preview (read-only)
               </p>
               {demoHistory.map((item) => (
-                <div key={item.id} className="space-y-3">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
-                      Original
-                    </p>
-                    <p className="text-base leading-relaxed text-foreground/80 whitespace-pre-wrap">
-                      {item.input_text}
-                    </p>
-                  </div>
-                  <div className="border-t border-border pt-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
-                      Refined
-                    </p>
-                    <p className="text-base font-medium leading-relaxed text-foreground whitespace-pre-wrap">
-                      {item.output_text}
-                    </p>
-                  </div>
-                  {item.explanation ? (
-                    <div className="border-t border-border pt-2">
-                      <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
-                        Explanation
-                      </p>
-                      <p className="text-sm leading-relaxed text-secondary whitespace-pre-wrap">
-                        {item.explanation}
-                      </p>
-                    </div>
-                  ) : null}
-                </div>
+                <HistoryCard
+                  key={item.id}
+                  item={item}
+                  formatDate={() => 'Just now'}
+                  copiedId={copied}
+                  deletingId={null}
+                  showActions={false}
+                />
               ))}
             </div>
           </CardContent>
@@ -324,84 +309,16 @@ export default function HistoryPage() {
     return (
       <div className="space-y-4">
         {history.map((item) => (
-          <Card
+          <HistoryCard
             key={item.id}
-            className="border border-border bg-card transition-colors hover:border-foreground"
-          >
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <CardTitle className="mb-2 text-sm font-normal leading-relaxed text-secondary">
-                    {formatDate(item.created_at)}
-                  </CardTitle>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleCopy(item.output_text, item.id)}
-                    className={cn(
-                      'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground',
-                    )}
-                  >
-                    <Copy className="w-4 h-4" />
-                    {copied === item.id ? 'Copied!' : 'Copy'}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleCopyPair(item)}
-                    className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground"
-                  >
-                    <Copy className="w-4 h-4" />
-                    Copy pair
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(item.id)}
-                    disabled={deletingId === item.id}
-                    className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-accent-error hover:border-accent-error/60 disabled:opacity-60"
-                  >
-                    {deletingId === item.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="w-4 h-4" />
-                    )}
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
-                  Original
-                </p>
-                <p className="text-base leading-relaxed text-foreground/80 whitespace-pre-wrap">
-                  {item.input_text}
-                </p>
-              </div>
-              <div className="border-t border-border pt-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
-                  Refined
-                </p>
-                <p className="text-base font-medium leading-relaxed text-foreground whitespace-pre-wrap">
-                  {item.output_text}
-                </p>
-              </div>
-              {item.explanation ? (
-                <div className="border-t border-border pt-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
-                    Explanation
-                  </p>
-                  <p className="text-sm leading-relaxed text-secondary whitespace-pre-wrap">
-                    {item.explanation}
-                  </p>
-                </div>
-              ) : null}
-            </CardContent>
-          </Card>
+            item={item}
+            formatDate={formatDate}
+            copiedId={copied}
+            deletingId={deletingId}
+            onCopy={handleCopy}
+            onCopyPair={handleCopyPair}
+            onDelete={handleDelete}
+          />
         ))}
       </div>
     );
@@ -428,5 +345,193 @@ export default function HistoryPage() {
         {renderBody()}
       </div>
     </div>
+  );
+}
+
+type HistoryCardProps = {
+  item: HistoryItem;
+  formatDate: (dateString: string) => string;
+  copiedId: string | null;
+  deletingId: string | null;
+  onCopy?: (text: string, id: string) => void;
+  onCopyPair?: (item: HistoryItem) => void;
+  onDelete?: (id: string) => void;
+  showActions?: boolean;
+};
+
+function HistoryCard({
+  item,
+  formatDate: formatDateFn,
+  copiedId,
+  deletingId: deletingIdProp,
+  onCopy,
+  onCopyPair,
+  onDelete,
+  showActions = true,
+}: HistoryCardProps) {
+  const changeHighlights = useMemo(
+    () => computeChangeHighlights(item.input_text, item.output_text),
+    [item.input_text, item.output_text],
+  );
+
+  const [viewMode, setViewMode] = useState<'changes' | 'refined'>(
+    changeHighlights.changes.length > 0 ? 'changes' : 'refined',
+  );
+  const [activeChangeId, setActiveChangeId] = useState<string | null>(
+    changeHighlights.changes[0]?.id ?? null,
+  );
+  const [isChangePanelOpen, setIsChangePanelOpen] = useState(false);
+
+  useEffect(() => {
+    if (viewMode === 'changes' && changeHighlights.changes.length === 0) {
+      setViewMode('refined');
+      setIsChangePanelOpen(false);
+    }
+
+    if (
+      activeChangeId &&
+      !changeHighlights.changes.some((change) => change.id === activeChangeId)
+    ) {
+      setActiveChangeId(changeHighlights.changes[0]?.id ?? null);
+    }
+  }, [viewMode, changeHighlights, activeChangeId]);
+
+  const changeCount = changeHighlights.changes.length;
+  const showChangesTab = changeCount > 0;
+
+  const handleViewModeChange = (mode: 'changes' | 'refined') => {
+    if (mode === 'changes' && !showChangesTab) return;
+    if (mode === 'changes' && showChangesTab && !activeChangeId) {
+      setActiveChangeId(changeHighlights.changes[0]?.id ?? null);
+    }
+    setViewMode(mode);
+    if (mode === 'refined') {
+      setIsChangePanelOpen(false);
+    }
+  };
+
+  const handleChangeCountClick = () => {
+    if (!showChangesTab) return;
+    setActiveChangeId(changeHighlights.changes[0]?.id ?? null);
+    setViewMode('changes');
+    setIsChangePanelOpen(true);
+  };
+
+  const handleHighlightSelect = (changeId: string) => {
+    setActiveChangeId(changeId);
+    setViewMode('changes');
+    setIsChangePanelOpen(true);
+  };
+
+  const handlePanelOpenChange = (open: boolean) => {
+    setIsChangePanelOpen(open);
+  };
+
+  return (
+    <Card className="border border-border bg-card transition-colors hover:border-foreground">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-start">
+          <div className="flex-1">
+            <CardTitle className="mb-2 text-sm font-normal leading-relaxed text-secondary">
+              {formatDateFn(item.created_at)}
+            </CardTitle>
+          </div>
+          {showActions ? (
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onCopy?.(item.output_text, item.id)}
+                className={cn(
+                  'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground',
+                )}
+              >
+                <Copy className="w-4 h-4" />
+                {copiedId === item.id ? 'Copied!' : 'Copy'}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onCopyPair?.(item)}
+                className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground"
+              >
+                <Copy className="w-4 h-4" />
+                Copy pair
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDelete?.(item.id)}
+                disabled={deletingIdProp === item.id}
+                className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-accent-error hover:border-accent-error/60 disabled:opacity-60"
+              >
+                {deletingIdProp === item.id ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
+                Remove
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
+            Original
+          </p>
+          <p className="text-base leading-relaxed text-foreground/80 whitespace-pre-wrap">
+            {item.input_text}
+          </p>
+        </div>
+        <div className="border-t border-border pt-2 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+            Refined
+          </p>
+
+          <RefinedOutputTabs
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+            changeCount={changeCount}
+            showChangesTab={showChangesTab}
+            onChangeCountClick={handleChangeCountClick}
+          />
+
+          {viewMode === 'changes' ? (
+            <RefinedChangeHighlights
+              segments={changeHighlights.segments}
+              changes={changeHighlights.changes}
+              activeChangeId={activeChangeId}
+              onHighlightSelect={handleHighlightSelect}
+            />
+          ) : (
+            <div className="rounded-md border border-border/70 bg-muted/30 px-4 py-3 text-base font-medium leading-relaxed text-foreground">
+              <p className="whitespace-pre-wrap">{item.output_text}</p>
+            </div>
+          )}
+        </div>
+        {item.explanation ? (
+          <div className="border-t border-border pt-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
+              Explanation
+            </p>
+            <p className="text-sm leading-relaxed text-secondary whitespace-pre-wrap">
+              {item.explanation}
+            </p>
+          </div>
+        ) : null}
+      </CardContent>
+
+      <div className="px-6 pb-4">
+        <ChangeDetailsPanel
+          open={isChangePanelOpen}
+          changes={changeHighlights.changes}
+          activeChangeId={activeChangeId}
+          onOpenChange={handlePanelOpenChange}
+          onActiveChangeId={setActiveChangeId}
+        />
+      </div>
+    </Card>
   );
 }
