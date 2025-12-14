@@ -35,7 +35,7 @@ export function InputForm() {
   const [userId, setUserId] = useState<string | null>(null);
   const [saveAction, setSaveAction] = useState<'saving' | 'removing' | null>(null);
   const [savedHistoryId, setSavedHistoryId] = useState<string | null>(null);
-  const { convertSentence, isLoading, error } = useConvertSentence();
+  const { convertSentence, cancelConversion, isLoading, error } = useConvertSentence();
   const { prompt } = usePromptSetting();
   const { toast } = useToast();
 
@@ -142,9 +142,20 @@ export function InputForm() {
       setIsChangeDialogOpen(false);
       setSavedHistoryId(null);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
       console.error('Conversion error:', err);
     }
   }, [convertSentence, inputText, isLoading, prompt]);
+
+  const handleCancel = useCallback(() => {
+    cancelConversion();
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.focus();
+    }
+  }, [cancelConversion]);
 
   const clearInput = useCallback(() => {
     setInputText('');
@@ -163,7 +174,8 @@ export function InputForm() {
     }
   }, []);
 
-  const canConvert = Boolean(inputText.trim()) && !isLoading;
+  const hasInput = Boolean(inputText.trim());
+  const canConvert = hasInput;
   const shortcutLabel =
     isMacUser === null ? '⌘ + ↵' : isMacUser ? '⌘ + ↵' : '⌃ + ↵';
   const ariaShortcut =
@@ -466,23 +478,23 @@ export function InputForm() {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button
-              onClick={handleConvert}
-              disabled={!canConvert}
+              onClick={isLoading ? handleCancel : handleConvert}
+              disabled={!isLoading && !canConvert}
               className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
-              aria-keyshortcuts={ariaShortcut}
+              aria-keyshortcuts={!isLoading ? ariaShortcut : undefined}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Converting...
+                  Cancel
                 </>
               ) : (
-                  <>
-                    <span>Refine</span>
-                    <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
-                      <span className={shortcutKeyClassName}>{shortcutLabel}</span>
-                    </span>
-                  </>
+                <>
+                  <span>Refine</span>
+                  <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
+                    <span className={shortcutKeyClassName}>{shortcutLabel}</span>
+                  </span>
+                </>
               )}
             </Button>
             <div className="flex flex-col gap-2 text-xs sm:flex-row sm:items-center">

@@ -1,7 +1,12 @@
 import type { ConvertResponse, ConvertSentenceInput } from './types';
 
+type ConvertOptions = {
+  signal?: AbortSignal;
+};
+
 export async function convertSentence(
-  input: ConvertSentenceInput
+  input: ConvertSentenceInput,
+  options?: ConvertOptions
 ): Promise<ConvertResponse> {
   const response = await fetch('/api/refine', {
     method: 'POST',
@@ -9,6 +14,7 @@ export async function convertSentence(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(input),
+    signal: options?.signal,
   });
 
   if (!response.ok) {
