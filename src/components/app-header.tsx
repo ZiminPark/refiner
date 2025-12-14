@@ -10,6 +10,15 @@ import {
 } from "@/components/ui/dialog";
 import { FeatureRequestPanel } from "@/features/feature-request/components/FeatureRequestPanel";
 import { createClient } from "@/lib/supabase/client";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -26,6 +35,16 @@ interface AppHeaderProps {
 export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
   const [hasSession, setHasSession] = useState(false);
   const [isFeatureRequestOpen, setIsFeatureRequestOpen] = useState(false);
+
+  const mobileNavLinks = hasSession
+    ? [
+        { href: "/history", label: "History" },
+        { href: "/settings", label: "Settings" },
+      ]
+    : [
+        { href: "/login", label: "Log in" },
+        { href: "/settings", label: "Settings" },
+      ];
 
   useEffect(() => {
     let isMounted = true;
@@ -66,6 +85,38 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
           English Refiner
         </Link>
         <div className="flex items-center gap-4">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                aria-label="Open navigation"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-72 px-5 py-6">
+              <SheetHeader>
+                <SheetTitle className="font-sans text-sm uppercase tracking-[0.23em] text-foreground/80">
+                  Navigation
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="mt-6 flex flex-col gap-2">
+                {mobileNavLinks.map((link) => (
+                  <SheetClose asChild key={link.href}>
+                    <Button
+                      asChild
+                      variant="ghost"
+                      className="h-11 w-full justify-start font-sans text-xs uppercase tracking-[0.23em] text-foreground/80"
+                    >
+                      <Link href={link.href}>{link.label}</Link>
+                    </Button>
+                  </SheetClose>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
           <nav className="hidden gap-6 font-sans text-xs uppercase tracking-[0.23em] text-foreground/70 md:flex">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
@@ -91,17 +142,7 @@ export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
               asChild
               variant="outline"
               size="sm"
-              className="font-sans text-[0.7rem] uppercase tracking-[0.23em] text-foreground/70 hover:text-foreground"
-            >
-              <Link href="/login">Log in</Link>
-            </Button>
-          )}
-          {!showSessionControls && !hasSession && (
-            <Button
-              asChild
-              variant="outline"
-              size="sm"
-              className="font-sans text-[0.7rem] uppercase tracking-[0.23em] text-foreground/70 hover:text-foreground md:hidden"
+              className="hidden font-sans text-[0.7rem] uppercase tracking-[0.23em] text-foreground/70 hover:text-foreground md:inline-flex"
             >
               <Link href="/login">Log in</Link>
             </Button>
