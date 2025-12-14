@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   title: 'American English Refiner - Improve Your English Writing',
   description: 'An AI-powered tool that converts your sentences into natural, grammatically correct American English.',
   metadataBase: SITE_URL,
+  icons: {
+    icon: '/icon.png',
+    apple: '/apple-icon.png',
+  },
   openGraph: {
     title: 'American English Refiner - Improve Your English Writing',
     description:
