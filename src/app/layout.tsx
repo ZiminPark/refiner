@@ -1,6 +1,6 @@
+import { getSiteUrl } from '@/lib/site-url';
 import type { Metadata } from 'next';
 import { Merriweather, Raleway } from 'next/font/google';
-import { getSiteUrl } from '@/lib/site-url';
 import './globals.css';
 import Providers from './providers';
 
@@ -19,41 +19,35 @@ const accentFont = Raleway({
 });
 
 export const metadata: Metadata = {
-  title: 'American English Refiner - Improve Your English Writing',
-  description: 'An AI-powered tool that converts your sentences into natural, grammatically correct American English.',
+  title: 'Refiner - Improve Your English Writing',
+  description: 'A tool that transforms your sentences into natural, grammatically correct English.',
   metadataBase: SITE_URL,
   icons: {
     icon: '/icon.png',
     apple: '/apple-icon.png',
   },
   openGraph: {
-    title: 'American English Refiner - Improve Your English Writing',
+    title: 'Refiner - Improve Your English Writing',
     description:
-      'An AI-powered tool that converts your sentences into natural, grammatically correct American English.',
+      'A tool that transforms your sentences into natural, grammatically correct English.',
     url: SITE_URL,
-    siteName: 'American English Refiner',
+    siteName: 'Refiner',
     type: 'website',
     images: [
       {
-        url: '/icon.png',
-        width: 1024,
-        height: 1024,
-        alt: 'American English Refiner',
-      },
-      {
-        url: '/opengraph-image',
+        url: '/og.png',
         width: 1200,
         height: 630,
-        alt: 'American English Refiner',
+        alt: 'Refiner',
       },
     ],
   },
   twitter: {
-    card: 'summary',
-    title: 'American English Refiner - Improve Your English Writing',
+    card: 'summary_large_image',
+    title: 'Refiner - Improve Your English Writing',
     description:
-      'An AI-powered tool that converts your sentences into natural, grammatically correct American English.',
-    images: ['/icon.png'],
+      'A tool that transforms your sentences into natural, grammatically correct English.',
+    images: ['/og.png'],
   },
 };
 
