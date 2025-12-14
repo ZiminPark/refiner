@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { ChangeDetailsPanel } from '@/features/sentence/components/ChangeDetailsPanel';
+import { ExplanationSection } from '@/features/sentence/components/ExplanationSection';
 import { RefinedChangeHighlights } from '@/features/sentence/components/RefinedChangeHighlights';
 import { RefinedOutputTabs } from '@/features/sentence/components/RefinedOutputTabs';
 import { computeChangeHighlights } from '@/features/sentence/lib/diff';
@@ -512,13 +513,8 @@ function HistoryCard({
           )}
         </div>
         {item.explanation ? (
-          <div className="border-t border-border pt-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-secondary">
-              Explanation
-            </p>
-            <p className="text-sm leading-relaxed text-secondary whitespace-pre-wrap">
-              {item.explanation}
-            </p>
+          <div className="pt-1">
+            <ExplanationSection text={item.explanation} />
           </div>
         ) : null}
       </CardContent>

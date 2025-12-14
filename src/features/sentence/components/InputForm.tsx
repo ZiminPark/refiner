@@ -13,6 +13,7 @@ import { useConvertSentence } from '../hooks/useConvertSentence';
 import { RefinedChangeHighlights } from './RefinedChangeHighlights';
 import { RefinedOutputTabs } from './RefinedOutputTabs';
 import { ChangeDetailsPanel } from './ChangeDetailsPanel';
+import { ExplanationSection } from './ExplanationSection';
 import { computeChangeHighlights } from '../lib/diff';
 import type { ChangeHighlightsResult, ConversionResult } from '../types';
 
@@ -587,15 +588,9 @@ export function InputForm() {
                 />
               )}
               
-              {/* Explanation Section */}
               {converted.explanation && (
-                <div className="pt-4 border-t border-accent-success/20">
-                  <h4 className="mb-2 text-sm font-semibold text-secondary">
-                    What Changed?
-                  </h4>
-                  <p className="text-sm leading-relaxed text-secondary whitespace-pre-wrap">
-                    {converted.explanation}
-                  </p>
+                <div className="pt-2">
+                  <ExplanationSection text={converted.explanation} />
                 </div>
               )}
             </CardContent>
