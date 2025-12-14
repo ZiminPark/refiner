@@ -44,6 +44,7 @@ The AI refinement prompt is editable from `src/app/home/settings/page.tsx` and p
 - History page is “saved-only”: copy output, copy pair, remove without confirm, clear-all per user, saved count chips.
 - Signed-out history shows an explainer + demo preview; `AuthSessionMissingError` is handled quietly.
 - Schema: `refinement_history` with RLS (select/insert/delete by user). See `docs/refinement_history.sql`.
+- Change-highlights UX: results default to the `Changes` tab with Grammarly-style inline highlights and the inline `ChangeDetailsPanel` for navigation; the `Refined` tab keeps free editing and copy always uses plain refined text. History cards reuse the same tabs/highlights/panel. Explanation sections are collapsible and folded by default for both refine and history views.
 
 ## Coding Style & Naming Conventions
 Per `docs/guideline.md` and `docs/clean-code.md`, default to client components (`use client`) and promise-based `page.tsx` params. Prefer TypeScript, Tailwind utilities, and shadcn/ui primitives; bring in date-fns, @tanstack/react-query, zod, react-hook-form, lucide-react, and zustand as described. Use intention-revealing PascalCase for components (`FeatureActionButton`), camelCase for hooks (`useSentenceHistory`), and UPPER_SNAKE_CASE for constants. Keep functions small, favor early returns, avoid mutation, and document “why” when behavior is non-obvious.
