@@ -132,6 +132,19 @@ export function InputForm() {
     }
   }, [convertSentence, inputText, isLoading, prompt]);
 
+  const clearInput = useCallback(() => {
+    setInputText('');
+    setConverted(null);
+    setRefinedText('');
+    setSavedHistoryId(null);
+    setSaveAction(null);
+    setCopied(false);
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.focus();
+    }
+  }, []);
+
   const canConvert = Boolean(inputText.trim()) && !isLoading;
   const shortcutLabel =
     isMacUser === null ? '⌘ + ↵' : isMacUser ? '⌘ + ↵' : '⌃ + ↵';
@@ -156,6 +169,32 @@ export function InputForm() {
     window.addEventListener('keydown', handleShortcut);
     return () => window.removeEventListener('keydown', handleShortcut);
   }, [handleConvert, canConvert]);
+
+  useEffect(() => {
+    const handleClearShortcut = (event: KeyboardEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.key !== 'Escape' ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const textarea = textareaRef.current;
+      if (!textarea) {
+        return;
+      }
+
+      event.preventDefault();
+      clearInput();
+    };
+
+    window.addEventListener('keydown', handleClearShortcut);
+    return () => window.removeEventListener('keydown', handleClearShortcut);
+  }, [clearInput]);
 
   useEffect(() => {
     const handleFocusShortcut = (event: KeyboardEvent) => {
@@ -359,7 +398,10 @@ export function InputForm() {
                   </>
               )}
             </Button>
-            <ShortcutHint label="/" description="Jump to input" />
+            <div className="flex flex-col gap-2 text-xs sm:flex-row sm:items-center">
+              <ShortcutHint label="/" description="Jump to input" />
+              <ShortcutHint label="Esc" description="Clear input" />
+            </div>
           </div>
         </CardContent>
       </Card>
