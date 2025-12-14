@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
-import { Check, Copy, Loader2, Star } from 'lucide-react';
+import { Check, ClipboardPaste, Copy, Loader2, Star } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,7 @@ export function InputForm() {
   const [isChangePanelOpen, setIsChangePanelOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [clipboardPrefilled, setClipboardPrefilled] = useState(false);
+  const [isPasting, setIsPasting] = useState(false);
   const [isMacUser, setIsMacUser] = useState<boolean | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const supabase = useRef(createClient());
@@ -58,7 +59,9 @@ export function InputForm() {
           setInputText(text);
         }
       } catch (clipError) {
-        console.warn('Auto-paste failed:', clipError);
+        if (!(clipError instanceof DOMException && clipError.name === 'NotAllowedError')) {
+          console.warn('Auto-paste failed:', clipError);
+        }
       } finally {
         if (!isCancelled) {
           setClipboardPrefilled(true);
@@ -174,6 +177,54 @@ export function InputForm() {
       textarea.focus();
     }
   }, []);
+
+  const pasteFromClipboard = useCallback(async () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.focus();
+    }
+
+    if (typeof navigator === 'undefined') {
+      return;
+    }
+
+    if (!navigator.clipboard?.readText) {
+      toast({
+        description:
+          'This browser does not allow clipboard paste via button. Use your device paste controls instead.',
+      });
+      return;
+    }
+
+    try {
+      setIsPasting(true);
+      const text = await navigator.clipboard.readText();
+
+      if (!text) {
+        toast({ description: 'Your clipboard is empty.' });
+        return;
+      }
+
+      setInputText(text);
+      toast({ description: 'Pasted from clipboard.' });
+    } catch (clipError) {
+      if (clipError instanceof DOMException && clipError.name === 'NotAllowedError') {
+        toast({
+          description:
+            'Clipboard access was blocked. Tap and hold in the input, then choose Paste.',
+        });
+        return;
+      }
+
+      console.error('[refine] paste failed', clipError);
+      toast({
+        description: 'Unable to paste from clipboard. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsPasting(false);
+    }
+  }, [toast]);
 
   const hasInput = Boolean(inputText.trim());
   const canConvert = hasInput;
@@ -478,27 +529,76 @@ export function InputForm() {
           )}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button
-              onClick={isLoading ? handleCancel : handleConvert}
-              disabled={!isLoading && !canConvert}
-              className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
-              aria-keyshortcuts={!isLoading ? ariaShortcut : undefined}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Cancel
-                </>
-              ) : (
-                <>
-                  <span>Refine</span>
-                  <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
-                    <span className={shortcutKeyClassName}>{shortcutLabel}</span>
-                  </span>
-                </>
-              )}
-            </Button>
-            <div className="flex flex-col gap-2 text-xs sm:flex-row sm:items-center">
+            <div className="hidden w-full sm:flex sm:w-auto">
+              <Button
+                type="button"
+                onClick={isLoading ? handleCancel : handleConvert}
+                disabled={!isLoading && !canConvert}
+                className="w-full sm:w-auto justify-center gap-3 px-8 font-sans text-sm uppercase tracking-[0.25em]"
+                aria-keyshortcuts={!isLoading ? ariaShortcut : undefined}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <span>Refine</span>
+                    <span className="hidden items-center text-xs font-normal tracking-[0.2em] sm:inline-flex">
+                      <span className={shortcutKeyClassName}>{shortcutLabel}</span>
+                    </span>
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <div className="flex w-full gap-3 sm:hidden">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={pasteFromClipboard}
+                disabled={isLoading || isPasting}
+                aria-label="Paste from clipboard"
+                className="flex-1 justify-center border-border"
+              >
+                {isPasting ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="sr-only">Pasting from clipboard</span>
+                  </>
+                ) : (
+                  <>
+                    <ClipboardPaste className="h-5 w-5" />
+                    <span className="sr-only">Paste from clipboard</span>
+                  </>
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={isLoading ? handleCancel : handleConvert}
+                disabled={!isLoading && !canConvert}
+                aria-label={isLoading ? 'Cancel conversion' : 'Refine sentence'}
+                aria-keyshortcuts={!isLoading ? ariaShortcut : undefined}
+                className="flex-1 justify-center px-6"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span className="sr-only">Cancel conversion</span>
+                  </>
+                ) : (
+                  <>
+                    <span aria-hidden className="text-[1.4rem] leading-none">
+                      🖋️
+                    </span>
+                    <span className="sr-only">Refine sentence</span>
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="hidden gap-2 text-xs sm:flex sm:flex-row sm:items-center">
               <ShortcutHint label="/" description="Jump to input" />
               <ShortcutHint label="Esc" description="Clear input" />
             </div>

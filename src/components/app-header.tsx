@@ -1,154 +1,53 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { FeatureRequestPanel } from "@/features/feature-request/components/FeatureRequestPanel";
-import { createClient } from "@/lib/supabase/client";
-import { Menu } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-
-const navLinks = [
-  { href: "/", label: "Refine" },
-  { href: "/history", label: "History" },
-  { href: "/settings", label: "Settings" },
-];
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import Link from 'next/link';
 
 interface AppHeaderProps {
   showSessionControls?: boolean;
+  hasSession?: boolean;
+  isSidebarOpen?: boolean;
+  onOpenMobileNav?: () => void;
+  onToggleSidebar?: () => void;
 }
 
-export function AppHeader({ showSessionControls = true }: AppHeaderProps) {
-  const [hasSession, setHasSession] = useState(false);
-  const [isFeatureRequestOpen, setIsFeatureRequestOpen] = useState(false);
-  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-
-  const mobileNavLinks = hasSession
-    ? [
-        { href: "/history", label: "History" },
-        { href: "/settings", label: "Settings" },
-      ]
-    : [
-        { href: "/login", label: "Log in" },
-        { href: "/settings", label: "Settings" },
-      ];
-
-  useEffect(() => {
-    let isMounted = true;
-    const supabase = createClient();
-
-    const syncSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (isMounted) {
-        setHasSession(Boolean(session));
-      }
-    };
-
-    syncSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
-      if (isMounted) {
-        setHasSession(Boolean(session));
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
+export function AppHeader({
+  showSessionControls = true,
+  hasSession = false,
+  isSidebarOpen = true,
+  onOpenMobileNav,
+  onToggleSidebar,
+}: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Link
           href="/"
           className="font-sans text-sm uppercase tracking-[0.28em] text-foreground/70 transition-colors hover:text-foreground"
         >
           Refiner
         </Link>
-        <div className="flex items-center gap-4">
-          <Sheet open={isMobileNavOpen} onOpenChange={setIsMobileNavOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                aria-label="Open navigation"
-              >
-                <Menu className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="w-72 px-5 py-6">
-              <SheetHeader>
-                <SheetTitle className="font-sans text-sm uppercase tracking-[0.23em] text-foreground/80">
-                  Navigation
-                </SheetTitle>
-              </SheetHeader>
-              <nav className="mt-6 flex flex-col gap-2">
-                {mobileNavLinks.map((link) => (
-                  <SheetClose asChild key={link.href}>
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className="h-11 w-full justify-start font-sans text-xs uppercase tracking-[0.23em] text-foreground/80"
-                    >
-                      <Link href={link.href}>{link.label}</Link>
-                    </Button>
-                  </SheetClose>
-                ))}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="h-11 w-full justify-start font-sans text-xs uppercase tracking-[0.23em] text-foreground/80"
-                  onClick={() => {
-                    setIsMobileNavOpen(false);
-                    setIsFeatureRequestOpen(true);
-                  }}
-                >
-                  Requests
-                </Button>
-              </nav>
-            </SheetContent>
-          </Sheet>
-          <nav className="hidden gap-6 font-sans text-xs uppercase tracking-[0.23em] text-foreground/70 md:flex">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="transition-colors hover:text-foreground">
-                {link.label}
-              </Link>
-            ))}
-            <Dialog open={isFeatureRequestOpen} onOpenChange={setIsFeatureRequestOpen}>
-              <DialogTrigger asChild>
-                <button className="font-sans text-xs uppercase tracking-[0.23em] text-foreground/70 transition-colors hover:text-foreground">
-                  Requests
-                </button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader className="sr-only">
-                  <DialogTitle>Shape the refinement lab</DialogTitle>
-                </DialogHeader>
-                <FeatureRequestPanel inModal onSuccess={() => setIsFeatureRequestOpen(false)} />
-              </DialogContent>
-            </Dialog>
-          </nav>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:inline-flex"
+            aria-label="Toggle sidebar"
+            aria-pressed={isSidebarOpen}
+            onClick={onToggleSidebar}
+          >
+            {isSidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label="Open navigation"
+            onClick={onOpenMobileNav}
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
           {showSessionControls && !hasSession && (
             <Button
               asChild

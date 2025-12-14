@@ -25,29 +25,27 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background px-6 py-16">
-      <div className="mx-auto w-full max-w-md space-y-10">
-        <div className="space-y-3 text-center">
-          <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">
-            Welcome back
-          </p>
-          <h1 className="text-[2.5rem] font-light leading-tight text-foreground">
-            Sign in to continue
-          </h1>
-          <p className="text-base leading-relaxed text-secondary">
-            Connect with your Google account to resume refining your English.
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-md space-y-10">
+      <div className="space-y-3 text-center">
+        <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">
+          Welcome back
+        </p>
+        <h1 className="text-[2.5rem] font-light leading-tight text-foreground">
+          Sign in to continue
+        </h1>
+        <p className="text-base leading-relaxed text-secondary">
+          Connect with your Google account to resume refining your English.
+        </p>
+      </div>
 
-        {message ? (
-          <div className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {message}
-          </div>
-        ) : null}
-
-        <div className="rounded-sm border border-border bg-card/70 p-8 shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
-          <GoogleSignInButton />
+      {message ? (
+        <div className="rounded-sm border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          {message}
         </div>
+      ) : null}
+
+      <div className="rounded-sm border border-border bg-card/70 p-8 shadow-[0_10px_40px_rgba(0,0,0,0.04)]">
+        <GoogleSignInButton />
       </div>
     </div>
   );

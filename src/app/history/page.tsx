@@ -1,6 +1,6 @@
 'use client';
 
-import { AppHeader } from '@/components/app-header';
+import { AppShell } from '@/components/app-shell';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -326,9 +326,8 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <div className="mx-auto max-w-5xl px-6 py-10">
+    <AppShell>
+      <div className="w-full max-w-4xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-3">
             <p className="font-sans text-xs uppercase tracking-[0.28em] text-secondary">
@@ -345,7 +344,7 @@ export default function HistoryPage() {
 
         {renderBody()}
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -430,52 +429,50 @@ function HistoryCard({
 
   return (
     <Card className="border border-border bg-card transition-colors hover:border-foreground">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="mb-2 text-sm font-normal leading-relaxed text-secondary">
-              {formatDateFn(item.created_at)}
-            </CardTitle>
-          </div>
-          {showActions ? (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onCopy?.(item.output_text, item.id)}
-                className={cn(
-                  'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground',
-                )}
-              >
-                <Copy className="w-4 h-4" />
-                {copiedId === item.id ? 'Copied!' : 'Copy'}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onCopyPair?.(item)}
-                className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground"
-              >
-                <Copy className="w-4 h-4" />
-                Copy pair
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDelete?.(item.id)}
-                disabled={deletingIdProp === item.id}
-                className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-accent-error hover:border-accent-error/60 disabled:opacity-60"
-              >
-                {deletingIdProp === item.id ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Trash2 className="w-4 h-4" />
-                )}
-                Remove
-              </Button>
-            </div>
-          ) : null}
+      <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex-1">
+          <CardTitle className="mb-0 text-sm font-normal leading-relaxed text-secondary">
+            {formatDateFn(item.created_at)}
+          </CardTitle>
         </div>
+        {showActions ? (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onCopy?.(item.output_text, item.id)}
+              className={cn(
+                'gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground',
+              )}
+            >
+              <Copy className="w-4 h-4" />
+              {copiedId === item.id ? 'Copied!' : 'Copy'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onCopyPair?.(item)}
+              className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:border-border hover:text-foreground"
+            >
+              <Copy className="w-4 h-4" />
+              Copy pair
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete?.(item.id)}
+              disabled={deletingIdProp === item.id}
+              className="gap-2 border border-transparent font-sans text-[0.7rem] uppercase tracking-[0.28em] text-accent-error hover:border-accent-error/60 disabled:opacity-60"
+            >
+              {deletingIdProp === item.id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4" />
+              )}
+              Remove
+            </Button>
+          </div>
+        ) : null}
       </CardHeader>
       <CardContent className="space-y-4">
         <div>

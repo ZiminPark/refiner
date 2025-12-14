@@ -1,14 +1,13 @@
 'use client';
 
-import { AppHeader } from '@/components/app-header';
+import { AppShell } from '@/components/app-shell';
 import { TypingAnimation } from '@/components/typing-animation';
 import { InputForm } from '@/features/sentence/components/InputForm';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <div className="mx-auto max-w-5xl px-6 py-10 space-y-10">
+    <AppShell>
+      <div className="w-full max-w-3xl space-y-10 mx-auto">
         <div className="space-y-3">
           <h1 className="text-3xl sm:text-[2.5rem] font-light leading-tight text-foreground">
             <TypingAnimation text="Refine your English" />
@@ -17,6 +16,6 @@ export default function HomePage() {
 
         <InputForm />
       </div>
-    </div>
+    </AppShell>
   );
 }

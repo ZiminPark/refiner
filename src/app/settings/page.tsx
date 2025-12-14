@@ -1,6 +1,6 @@
 'use client';
 
-import { AppHeader } from '@/components/app-header';
+import { AppShell } from '@/components/app-shell';
 import { SignOutButton } from '@/components/sign-out-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -128,9 +128,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader />
-      <div className="mx-auto max-w-5xl px-6 py-10">
+    <AppShell>
+      <div className="w-full max-w-4xl">
         <div className="mb-8 space-y-3">
           <p className="font-sans text-xs uppercase tracking-[0.3em] text-secondary">Workbench</p>
           <h1 className="text-[2.5rem] font-light leading-tight text-foreground">Settings</h1>
@@ -216,6 +215,6 @@ export default function SettingsPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </AppShell>
   );
 }
