@@ -38,7 +38,6 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [isClearing, setIsClearing] = useState(false);
 
   const fetchHistory = useCallback(async () => {
     setIsLoading(true);
@@ -186,43 +185,6 @@ export default function HistoryPage() {
       });
     } finally {
       setDeletingId(null);
-    }
-  };
-
-  const handleClearAll = async () => {
-    if (!userId) {
-      toast({
-        description: 'Log in to manage your history.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const shouldClear = window.confirm('Clear all saved refinements? This cannot be undone.');
-    if (!shouldClear) {
-      return;
-    }
-
-    setIsClearing(true);
-    try {
-      const { error } = await supabase
-        .from('refinement_history')
-        .delete()
-        .eq('user_id', userId);
-
-      if (error) {
-        throw error;
-      }
-
-      setHistory([]);
-    } catch (clearError) {
-      console.error('[history] clear failed', clearError);
-      toast({
-        description: 'Unable to clear history right now.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsClearing(false);
     }
   };
 
@@ -461,29 +423,6 @@ export default function HistoryPage() {
               A clean log of what went in, what came out, and when it happened.
             </p>
           </div>
-          {userId && (
-            <div className="flex flex-col items-start gap-3 md:items-end">
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-secondary">
-                  Saved only
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-secondary">
-                  Saved: {history.length}
-                </span>
-              </div>
-              {history.length > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handleClearAll}
-                  disabled={isClearing}
-                  className="gap-2 border-border font-sans text-[0.7rem] uppercase tracking-[0.28em] text-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isClearing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  Clear All
-                </Button>
-              )}
-            </div>
-          )}
         </div>
 
         {renderBody()}
