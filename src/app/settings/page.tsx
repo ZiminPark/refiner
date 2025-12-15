@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const [settingsSaved, setSettingsSaved] = useState(false);
   const promptSaveTimeoutRef = useRef<number | null>(null);
   const settingsSaveTimeoutRef = useRef<number | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [settings, setSettings] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -30,6 +31,7 @@ export default function SettingsPage() {
   const { prompt, setPrompt, defaultPrompt } = usePromptSetting();
   const [promptDraft, setPromptDraft] = useState(prompt);
   const isPromptDirty = promptDraft !== prompt;
+  const isAuthenticated = Boolean(user);
 
   useEffect(() => {
     setPromptDraft(prompt);
@@ -53,6 +55,7 @@ export default function SettingsPage() {
     const supabase = createClient();
 
     const applyUser = (user: SupabaseUser) => {
+      setUser(user);
       setSettings((previous) => {
         const nextName =
           user.user_metadata?.full_name ??
@@ -67,9 +70,14 @@ export default function SettingsPage() {
     };
 
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (isMounted && user) {
+      if (!isMounted) {
+        return;
+      }
+      if (user) {
         lastUserIdRef.current = user.id;
         applyUser(user);
+      } else {
+        setUser(null);
       }
     });
 
@@ -85,6 +93,9 @@ export default function SettingsPage() {
           lastUserIdRef.current = nextUser.id;
         }
         applyUser(nextUser);
+      } else {
+        lastUserIdRef.current = null;
+        setUser(null);
       }
     });
 
@@ -95,6 +106,10 @@ export default function SettingsPage() {
   }, []);
 
   const handlePromptSave = () => {
+    if (!user) {
+      return false;
+    }
+
     const nextPrompt = promptDraft.trim().length > 0 ? promptDraft : defaultPrompt;
     const shouldShowSaved = isPromptDirty || nextPrompt !== prompt;
 
@@ -116,6 +131,10 @@ export default function SettingsPage() {
   };
 
   const handleSettingsSave = () => {
+    if (!user) {
+      return;
+    }
+
     handlePromptSave();
     setSettingsSaved(true);
     if (settingsSaveTimeoutRef.current) {
@@ -162,11 +181,18 @@ export default function SettingsPage() {
                   onChange={(event) => setPromptDraft(event.target.value)}
                   rows={8}
                   className="text-base leading-relaxed"
+                  disabled={!isAuthenticated}
                 />
               </div>
               <p className="text-sm leading-relaxed text-gray-500">
                 This prompt guides the AI&apos;s behavior when refining your sentences.
               </p>
+              {!isAuthenticated ? (
+                <p className="text-sm font-medium leading-relaxed text-amber-600">
+                  Sign in to make this prompt truly yours—we’ll remember your guidance so every refinement stays aligned with
+                  the value you deliver.
+                </p>
+              ) : null}
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
                 <Button
                   type="button"
@@ -174,6 +200,7 @@ export default function SettingsPage() {
                   size="default"
                   onClick={() => setPromptDraft(defaultPrompt)}
                   className="w-full sm:w-auto border-border font-sans text-[0.75rem] uppercase tracking-[0.3em] text-secondary hover:text-foreground"
+                  disabled={!isAuthenticated}
                 >
                   Reset to Default
                 </Button>
@@ -181,7 +208,7 @@ export default function SettingsPage() {
                   type="button"
                   size="default"
                   onClick={handlePromptSave}
-                  disabled={!isPromptDirty}
+                  disabled={!isPromptDirty || !isAuthenticated}
                   className="w-full sm:w-auto px-8 font-sans text-[0.75rem] uppercase tracking-[0.3em] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {promptSaved && !isPromptDirty ? (
