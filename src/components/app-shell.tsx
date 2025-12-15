@@ -3,7 +3,7 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
@@ -15,6 +15,8 @@ export function AppShell({ children }: AppShellProps) {
   const [hasSession, setHasSession] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const desktopLeftOffset =
+    'max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem))';
 
   useEffect(() => {
     let isMounted = true;
@@ -46,7 +48,21 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen bg-background"
+      style={
+        {
+          '--shell-left-offset': desktopLeftOffset,
+        } as CSSProperties
+      }
+    >
+      <AppSidebar
+        hasSession={hasSession}
+        isMobileNavOpen={isMobileNavOpen}
+        onMobileNavOpenChange={setIsMobileNavOpen}
+        isCollapsed={isSidebarCollapsed}
+      />
+
       <div className="relative mx-auto w-full max-w-6xl px-6 pt-6">
         <div className="flex items-center gap-2">
           <Button
@@ -63,7 +79,7 @@ export function AppShell({ children }: AppShellProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute left-0 top-6 hidden md:inline-flex"
+          className="fixed left-[var(--shell-left-offset)] top-6 z-50 hidden md:inline-flex"
           aria-label="Toggle sidebar"
           aria-pressed={!isSidebarCollapsed}
           onClick={() => setIsSidebarCollapsed((previous) => !previous)}
@@ -75,15 +91,7 @@ export function AppShell({ children }: AppShellProps) {
           )}
         </Button>
 
-        <div className="mt-6 flex w-full flex-col gap-6 pb-10 md:flex-row md:gap-8">
-          <AppSidebar
-            hasSession={hasSession}
-            isMobileNavOpen={isMobileNavOpen}
-            onMobileNavOpenChange={setIsMobileNavOpen}
-            isCollapsed={isSidebarCollapsed}
-          />
-          <main className="flex-1 pb-12">{children}</main>
-        </div>
+        <main className="mt-6 pb-12 md:pl-64">{children}</main>
       </div>
     </div>
   );

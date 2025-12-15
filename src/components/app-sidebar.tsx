@@ -98,12 +98,12 @@ export function AppSidebar({
     <>
       <aside
         className={cn(
-          'hidden shrink-0 transition-[width,opacity] duration-200 md:block',
-          isCollapsed ? 'pointer-events-none w-0 opacity-0' : 'w-60 opacity-100',
+          'fixed left-[var(--shell-left-offset)] top-24 bottom-6 z-40 hidden w-60 overflow-y-auto transition-[opacity,transform] duration-200 md:block',
+          isCollapsed && 'pointer-events-none -translate-x-2 opacity-0',
         )}
         aria-hidden={isCollapsed}
       >
-        <div className={cn('sticky top-24 space-y-6 transition-opacity duration-200', isCollapsed && 'opacity-0')}>
+        <div className="space-y-6">
           <nav className="flex flex-col gap-2">
             {desktopNavLinks.map((link) => renderNavLink(link.href, link.label))}
             <button
