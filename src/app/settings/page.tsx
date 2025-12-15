@@ -4,7 +4,6 @@ import { AppShell } from '@/components/app-shell';
 import { SignOutButton } from '@/components/sign-out-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { usePromptSetting } from '@/hooks/usePromptSetting';
 import { createClient } from '@/lib/supabase/client';
@@ -163,18 +162,15 @@ export default function SettingsPage() {
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div>
-                  <CardTitle className="text-2xl font-semibold leading-relaxed">AI Prompt</CardTitle>
+                  <CardTitle className="text-2xl font-semibold leading-relaxed">Refinement Prompt</CardTitle>
                   <CardDescription className="text-sm leading-relaxed">
-                    Customize how the AI refines your sentences.
+                    This prompt guides the AI&apos;s behavior when refining your sentences.
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="prompt" className="text-sm font-semibold">
-                  Refinement Prompt
-                </Label>
                 <Textarea
                   id="prompt"
                   value={promptDraft}
@@ -184,13 +180,9 @@ export default function SettingsPage() {
                   disabled={!isAuthenticated}
                 />
               </div>
-              <p className="text-sm leading-relaxed text-gray-500">
-                This prompt guides the AI&apos;s behavior when refining your sentences.
-              </p>
               {!isAuthenticated ? (
                 <p className="text-sm font-medium leading-relaxed text-amber-600">
-                  Sign in to make this prompt truly yours—we’ll remember your guidance so every refinement stays aligned with
-                  the value you deliver.
+                  Sign in to make this prompt truly yours— we’ll remember your preferences.
                 </p>
               ) : null}
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
@@ -226,20 +218,22 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border border-border bg-card/85">
-            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <CardTitle className="text-2xl font-semibold leading-relaxed">Account</CardTitle>
-                <CardDescription className="text-sm leading-relaxed">
-                  Sign out of Refiner on this device.
-                </CardDescription>
-              </div>
-              <SignOutButton />
-            </CardHeader>
-            <CardContent className="text-sm leading-relaxed text-secondary">
-              Signing out will end your current session and return you to the login screen.
-            </CardContent>
-          </Card>
+          {isAuthenticated && (
+            <Card className="border border-border bg-card/85">
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-2xl font-semibold leading-relaxed">Account</CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    Sign out of Refiner on this device.
+                  </CardDescription>
+                </div>
+                <SignOutButton />
+              </CardHeader>
+              <CardContent className="text-sm leading-relaxed text-secondary">
+                Signing out will end your current session and return you to the login screen.
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </AppShell>
