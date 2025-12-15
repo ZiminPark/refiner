@@ -3,9 +3,9 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
+import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 interface AppShellProps {
   children: ReactNode;
@@ -15,8 +15,9 @@ export function AppShell({ children }: AppShellProps) {
   const [hasSession, setHasSession] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const desktopLeftOffset =
+  const desktopContentLeftOffset =
     'max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem))';
+  const desktopSidebarLeftOffset = 'max(1rem, calc((100vw - 72rem) / 2 - 9rem))';
 
   useEffect(() => {
     let isMounted = true;
@@ -52,7 +53,8 @@ export function AppShell({ children }: AppShellProps) {
       className="min-h-screen bg-background"
       style={
         {
-          '--shell-left-offset': desktopLeftOffset,
+          '--shell-content-left-offset': desktopContentLeftOffset,
+          '--shell-sidebar-left-offset': desktopSidebarLeftOffset,
         } as CSSProperties
       }
     >
@@ -79,7 +81,7 @@ export function AppShell({ children }: AppShellProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-[var(--shell-left-offset)] top-6 z-50 hidden md:inline-flex"
+          className="fixed left-[var(--shell-sidebar-left-offset)] top-6 z-50 hidden md:inline-flex"
           aria-label="Toggle sidebar"
           aria-pressed={!isSidebarCollapsed}
           onClick={() => setIsSidebarCollapsed((previous) => !previous)}
@@ -91,7 +93,7 @@ export function AppShell({ children }: AppShellProps) {
           )}
         </Button>
 
-        <main className="mt-6 pb-12 md:pl-64">{children}</main>
+        <main className="mt-6 pb-12">{children}</main>
       </div>
     </div>
   );

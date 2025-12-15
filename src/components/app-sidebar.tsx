@@ -98,7 +98,7 @@ export function AppSidebar({
     <>
       <aside
         className={cn(
-          'fixed left-[var(--shell-left-offset)] top-24 bottom-6 z-40 hidden w-60 overflow-y-auto transition-[opacity,transform] duration-200 md:block',
+          'fixed left-[var(--shell-sidebar-left-offset)] top-24 bottom-6 z-40 hidden w-52 overflow-y-auto transition-[opacity,transform] duration-200 md:block',
           isCollapsed && 'pointer-events-none -translate-x-2 opacity-0',
         )}
         aria-hidden={isCollapsed}
