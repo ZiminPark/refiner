@@ -4,16 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Send, Sparkles } from 'lucide-react';
+import { Loader2, Mail, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useFeatureRequest } from '../hooks/useFeatureRequest';
 import type { FeatureRequestCategory } from '../types';
@@ -55,20 +48,10 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
       return;
     }
 
-    if (!trimmedDetails) {
-      toast({
-        description: 'Details are required.',
-        className:
-          'bg-amber-50 border border-amber-200 text-amber-900 font-semibold tracking-tight',
-      });
-      return;
-    }
-
     try {
       await sendFeatureRequest({
         title: trimmedTitle,
         details: trimmedDetails,
-        category,
         contact: trimmedContact || undefined,
       });
 
@@ -103,47 +86,21 @@ export function FeatureRequestPanel({ inModal = false, onSuccess }: FeatureReque
         <CardTitle className="text-2xl font-light leading-snug text-foreground">
           Shape the refinement lab
         </CardTitle>
-        <p className="text-sm leading-relaxed text-secondary">
-          Drop an idea, friction point, or integration wish.
-        </p>
         <div className="flex flex-wrap gap-2 text-[0.7rem] uppercase tracking-[0.3em] text-muted-foreground">
         </div>
       </CardHeader>
       <CardContent>
         <form className="space-y-5" onSubmit={handleSubmit}>
-          <div className="grid gap-4 md:grid-cols-[1.4fr_0.6fr]">
-            <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-[0.28em] text-secondary">
-                Title
-              </Label>
-              <Input
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                disabled={isSubmitting}
-                className="bg-background/60"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-xs uppercase tracking-[0.28em] text-secondary">
-                Category
-              </Label>
-              <Select
-                value={category}
-                onValueChange={(value: FeatureRequestCategory) => setCategory(value)}
-                disabled={isSubmitting}
-              >
-                <SelectTrigger className="bg-background/60">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label className="text-xs uppercase tracking-[0.28em] text-secondary">
+              Title
+            </Label>
+            <Input
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              disabled={isSubmitting}
+              className="w-full bg-background/60"
+            />
           </div>
 
           <div className="space-y-2">

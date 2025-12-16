@@ -3,12 +3,11 @@ import { z } from 'zod';
 
 const featureRequestSchema = z.object({
   title: z.string().trim().min(1, 'Title is required'),
-  details: z.string().trim().min(1, 'Details are required'),
+  details: z.string().trim(),
   contact: z
     .union([z.string().email(), z.literal('')])
     .optional()
-    .transform((val) => (val === '' ? undefined : val)),
-  category: z.enum(['product', 'quality', 'integration', 'other']).optional(),
+    .transform((val) => (val === '' ? undefined : val))
 });
 
 export async function POST(request: NextRequest) {
@@ -44,13 +43,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { title, details, contact, category } = body;
+  const { title, details, contact } = body;
   const now = new Date().toISOString();
 
   const text = [
-    `*New feature request* ${category ? `• ${category}` : ''}`,
+    `*New feature request*`,
     `*Title:* ${title}`,
-    `*Details:* ${details}`,
+    details ? `*Details:* ${details}` : undefined,
     contact ? `*Contact:* ${contact}` : '*Contact:* (not provided)',
     `*Submitted:* ${now}`,
   ].join('\n');
