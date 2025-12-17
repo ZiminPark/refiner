@@ -178,6 +178,23 @@ export function InputForm() {
     }
   }, []);
 
+  const pasteClipboardIfAvailable = useCallback(async () => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard?.readText) {
+      return;
+    }
+
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        setInputText(text);
+      }
+    } catch (clipError) {
+      if (!(clipError instanceof DOMException && clipError.name === 'NotAllowedError')) {
+        console.warn('[refine] clipboard read after clear failed', clipError);
+      }
+    }
+  }, []);
+
   const pasteFromClipboard = useCallback(async () => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -297,11 +314,12 @@ export function InputForm() {
 
       event.preventDefault();
       clearInput();
+      void pasteClipboardIfAvailable();
     };
 
     window.addEventListener('keydown', handleClearShortcut);
     return () => window.removeEventListener('keydown', handleClearShortcut);
-  }, [clearInput]);
+  }, [clearInput, pasteClipboardIfAvailable]);
 
   useEffect(() => {
     const handleFocusShortcut = (event: KeyboardEvent) => {
